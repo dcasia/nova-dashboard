@@ -12,6 +12,11 @@ use JsonSerializable;
 abstract class Dashboard implements JsonSerializable
 {
 
+    public static function humanize(string $value): string
+    {
+        return Str::title(Str::snake($value, ' '));
+    }
+
     /**
      * Get the displayable label of the resource.
      *
@@ -19,7 +24,17 @@ abstract class Dashboard implements JsonSerializable
      */
     public static function label(): string
     {
-        return Str::plural(Str::title(Str::snake(class_basename(static::class), ' ')));
+        return static::humanize(class_basename(static::class));
+    }
+
+    public function title(): string
+    {
+        return static::$title ?? static::humanize(class_basename(static::class));
+    }
+
+    public function subtitle(): ?string
+    {
+        return static::$subtitle ?? null;
     }
 
     /**
@@ -29,7 +44,7 @@ abstract class Dashboard implements JsonSerializable
      */
     public static function uriKey(): string
     {
-        return Str::plural(Str::kebab(class_basename(static::class)));
+        return Str::kebab(class_basename(static::class));
     }
 
     public function filters(): array
@@ -120,6 +135,8 @@ abstract class Dashboard implements JsonSerializable
         $filters = $this->resolveFilters();
 
         return [
+            'title' => $this->title(),
+            'subtitle' => $this->subtitle(),
             'filters' => $filters,
             'presets' => $this->resolvePresets($filters),
             'widgets' => $this->resolveWidgets(),

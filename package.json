@@ -11,7 +11,6 @@
     },
     "devDependencies": {
         "@babel/runtime": "^7.10.4",
-        "@shellybits/v-chacheli": "^0.1.1",
         "chart.js": "^2.9.3",
         "cross-env": "^7.0.2",
         "gridstack": "^1.1.2",
@@ -20,11 +19,8 @@
         "lodash": "^4.17.15",
         "sass": "^1.26.9",
         "sass-loader": "^9.0.1",
+        "vue": "^2.6.11",
         "vue-chartjs": "^3.5.0",
-        "vue-responsive-dash": "^0.4.2",
         "vue-template-compiler": "^2.6.11"
-    },
-    "dependencies": {
-        "vue": "^2.6.11"
     }
 }

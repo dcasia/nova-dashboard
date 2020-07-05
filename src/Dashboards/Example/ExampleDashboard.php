@@ -10,9 +10,14 @@ use DigitalCreative\NovaBi\Widgets\WidgetPreset;
 class ExampleDashboard extends Dashboard
 {
 
+    public static string $title = 'Example Dashboard';
+
     public function filters(): array
     {
         return [
+            (new TestFilter())->withMeta([ 'currentValue' => '2010-12-10' ]),
+            (new TestFilter())->withMeta([ 'currentValue' => '2010-12-10' ]),
+            (new TestFilter())->withMeta([ 'currentValue' => '2010-12-10' ]),
             (new TestFilter())->withMeta([ 'currentValue' => '2010-12-10' ]),
         ];
     }

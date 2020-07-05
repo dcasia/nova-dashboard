@@ -2,7 +2,6 @@
 
 namespace DigitalCreative\NovaBi\Widgets;
 
-use App\Nova\Filters\TestFilter;
 use DigitalCreative\NovaBi\Filters;
 use Illuminate\Support\Collection;
 use Laravel\Nova\Fields\Select;

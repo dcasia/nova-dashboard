@@ -2,22 +2,62 @@
 
     <div class="nova-bi">
 
-        <button class="btn btn-default btn-primary" @click="closeModal = false">
-            Add Widget
-        </button>
+        <card class="flex p-4 justify-between" :class="{ 'rounded-b-none': openFilterView }">
 
-        <component class="flex flex-col inline-flex"
-                   v-for="filter in filters"
-                   :key="filter.name"
-                   :resource-name="resourceName"
-                   :filter-key="filter.class"
-                   :is="filter.component"
-                   @input="filterChanged"
-                   @change="filterChanged"/>
+            <div class="flex flex-col justify-center">
+                <h1 class="flex text-90 font-normal text-2xl">{{ title }}</h1>
+                <p class="mt-1 text-90 leading-tight" v-if="subtitle">
+                    {{ subtitle }}
+                </p>
+            </div>
 
-        <!--        <designer v-if="editMode" ref="designer" :layout="layout" :chachelis="widgets"/>-->
-        <!--        <layout v-if="!editMode" :layout="layout" :chachelis="widgets" :data="data"/>-->
-        <div class="grid-stack" ref="grid">
+            <div class="flex items-center">
+
+                <button role="button"
+                        class="rounded active:outline-none active:shadow-outline focus:outline-none focus:shadow-outline mr-2"
+                        @click="closeModal = false">
+
+                    <div
+                        class="h-dropdown-trigger text-white font-bold flex items-center cursor-pointer select-none px-3 border-2 border-30 rounded bg-primary border-primary">
+                        Add Widget
+                    </div>
+
+                </button>
+
+                <dropdown v-if="filters.length > 0" @click.native="openFilterView = !openFilterView">
+
+                    <dropdown-trigger class="bg-30 px-3 border-2 border-30 rounded"
+                                      :class="{ 'bg-primary border-primary': openFilterView }"
+                                      :active="openFilterView">
+
+                        <icon type="filter" :class="openFilterView ? 'text-white' : 'text-80'"/>
+
+                        <!--                        <span v-if="openFilterView" class="ml-2 font-bold text-white text-80">-->
+                        <!--                            {{ activeFilterCount }}-->
+                        <!--                        </span>-->
+
+                    </dropdown-trigger>
+
+                </dropdown>
+
+            </div>
+
+        </card>
+
+        <card v-if="openFilterView" class="flex flex-wrap rounded-t-none border-t border-40">
+
+            <component class="flex flex-col inline-flex w-1/2"
+                       v-for="filter in filters"
+                       :key="filter.name"
+                       :resource-name="resourceName"
+                       :filter-key="filter.class"
+                       :is="filter.component"
+                       @input="filterChanged"
+                       @change="filterChanged"/>
+
+        </card>
+
+        <div class="grid-stack flex-1 -mx-2 mt-8" ref="grid">
 
             <div :ref="widget.id" v-for="widget in activeWidgets" :key="widget.id"
                  @dblclick="editOption(widget)">
@@ -45,10 +85,6 @@
 
 <script>
 
-    import Designer from '@shellybits/v-chacheli/dist/ChacheliDesigner'
-    import Layout from '@shellybits/v-chacheli/dist/ChacheliLayout'
-    import '@shellybits/v-chacheli/dist/ChacheliDesigner.css'
-    import '@shellybits/v-chacheli/dist/ChacheliLayout.css'
     import resource from '~~nova~~/store/resources'
     import 'gridstack/dist/gridstack.all'
     import 'gridstack/dist/gridstack.min.css'
@@ -57,29 +93,28 @@
 
     export default {
         name: 'app',
-        components: { CreateWidgetModal, Designer, Layout },
+        components: { CreateWidgetModal },
         data() {
 
             const resourceName = this.$route.params.resource
-            const { columns, rows, widgets, presets, filters } = Nova.config[ 'nova-bi' ]
+            const { title, subtitle, widgets, presets, filters } = Nova.config[ 'nova-bi' ]
 
             this.$store.registerModule(resourceName, resource)
             this.$store.commit(`${ resourceName }/storeFilters`, filters)
 
             return {
+                title,
+                subtitle,
                 filters,
                 resourceName,
                 widgets,
                 presets,
+                openFilterView: true,
                 selectedWidget: null,
                 activeWidgets: [],
                 closeModal: true,
                 gridstack: null,
                 idCounter: 10,
-                layout: {
-                    cols: columns,
-                    rows: rows
-                },
                 editMode: false,
                 data: {}
             }
@@ -171,27 +206,11 @@
 
 <style lang="scss">
 
-    [data-testid="content"] {
-        height: calc(100% - 3.75rem);
-    }
-
-    .chacheli-layout .chacheli > * {
-        height: 100%;
-        display: flex;
-        overflow: hidden;
-    }
-
     .nova-bi {
         width: 100%;
         height: 100%;
-        display: flex;
-        flex-direction: column;
+        display: block;
     }
 
-    .chacheli .content {
-        min-width: initial;
-        width: initial;
-        max-width: initial;
-    }
 </style>
 
