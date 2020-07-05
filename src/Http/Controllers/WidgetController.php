@@ -4,18 +4,17 @@ namespace DigitalCreative\NovaBi\Http\Controllers;
 
 use DigitalCreative\NovaBi\Filters;
 use DigitalCreative\NovaBi\NovaBi;
-use Laravel\Nova\FilterDecoder;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
 
 class WidgetController
 {
 
-    public function fetch(string $resource, string $id, NovaRequest $request)
+    public function fetch(string $resource, string $key, NovaRequest $request)
     {
 
         $filters = $request->input('filters');
-
+        $options = $request->input('options');
 
         $tool = $this->findTool($request);
 
@@ -23,7 +22,7 @@ class WidgetController
 
             $filters = new Filters($filters, $dashboard->filters());
 
-            return $dashboard->resolveData($id, $filters);
+            return $dashboard->resolveData($key, collect($options), $filters);
 
         }
 

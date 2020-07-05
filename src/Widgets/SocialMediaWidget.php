@@ -2,22 +2,71 @@
 
 namespace DigitalCreative\NovaBi\Widgets;
 
-abstract class SocialMediaWidget extends Widget
+use App\Nova\Filters\TestFilter;
+use DigitalCreative\NovaBi\Filters;
+use Illuminate\Support\Collection;
+use Laravel\Nova\Fields\Select;
+
+class SocialMediaWidget extends Widget
 {
 
-    public function __construct(int $x, int $y, int $width, int $height)
-    {
-        parent::__construct($x, $y, $width, $height);
-
-        $this->withMeta([ 'type' => $this->type() ]);
-    }
-
+    public const TYPE_FACEBOOK = 'facebook';
+    public const TYPE_TWITTER = 'twitter';
 
     public function component(): string
     {
         return 'social-media-widget';
     }
 
-    abstract public function type(): string;
+    public function options(): array
+    {
+        return [
+            Select::make('Type')
+                  ->options([
+                      self::TYPE_TWITTER => 'Twitter',
+                      self::TYPE_FACEBOOK => 'Facebook',
+                  ])
+        ];
+    }
 
+    /**
+     * @param Filters $filters
+     * @param Collection $options
+     *
+     * @return string[][]
+     */
+    public function resolveValue(Collection $options, Filters $filters): array
+    {
+
+        if ($options->get('type') === self::TYPE_TWITTER) {
+
+            return [
+                [
+                    '10k',
+                    'tweets'
+                ],
+                [
+                    '20k',
+                    'mentions'
+                ],
+                [
+                    '13k',
+                    'shares'
+                ]
+            ];
+
+        }
+
+        return [
+            [
+                '800k',
+                'followers'
+            ],
+            [
+                '1800k',
+                'likes'
+            ]
+        ];
+
+    }
 }

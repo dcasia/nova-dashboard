@@ -12,7 +12,8 @@
 
         </div>
 
-        <div style="background: #23242d" class="flex text-white justify-center rounded-b-lg p-2" :class="{ 'p-4': meta.h > 1 }">
+        <div style="background: #23242d" class="flex text-white justify-center rounded-b-lg p-2"
+             :class="{ 'p-4': meta.h > 1 }">
 
             <template v-for="([ content, label ], index) of value">
 
@@ -53,7 +54,6 @@
         components: { Facebook, TestChart },
         props: [ 'meta' ],
         data() {
-            console.log(this.meta)
             return {
                 socialMedias,
                 loading: true,
@@ -65,8 +65,12 @@
             const callback = encodedFilters => this.fetchData(encodedFilters)
 
             Nova.$on('NovaFilterUpdate', callback)
+            Nova.$on(`widget-${ this.meta.id }-update`, callback)
 
-            this.$on('hook:destroyed', () => Nova.$off('NovaFilterUpdate', callback))
+            this.$on('hook:destroyed', () => {
+                Nova.$off('NovaFilterUpdate', callback)
+                Nova.$off(`widget-${ this.meta.id }-update`, callback)
+            })
 
             await this.fetchData()
 
@@ -77,7 +81,10 @@
                 this.loading = true
 
                 const response = await Minimum(
-                    Nova.request(`/nova-vendor/nova-bi/${ this.meta.uri }/${ this.meta.id }?filters=${ encodedFilters }`), 300
+                    Nova.request().post(`/nova-vendor/nova-bi/${ this.meta.uri }/${ this.meta.key }`, {
+                        filters: encodedFilters,
+                        options: this.meta.options
+                    }), 300
                 )
 
                 this.value = response.data
@@ -87,7 +94,7 @@
         },
         computed: {
             icon() {
-                return socialMedias[ this.meta.data.type ]
+                return socialMedias[ this.meta.options.type ]
             }
         }
     }

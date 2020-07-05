@@ -3,6 +3,7 @@
 namespace DigitalCreative\NovaBi\Widgets;
 
 use DigitalCreative\NovaBi\Filters;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Laravel\Nova\Makeable;
 use Laravel\Nova\Metable;
@@ -15,23 +16,14 @@ abstract class Widget
 
     private static int $counter = 0;
 
-    public string $id;
-    public int $x;
-    public int $y;
-    public int $width;
-    public int $height;
+    public string $key;
 
-    public function __construct(int $x, int $y, int $width, int $height)
+    public function __construct()
     {
-        $this->id = md5("$x, $y, $width, $height" . self::$counter++);
-        $this->x = $x;
-        $this->y = $y;
-        $this->width = $width;
-        $this->height = $height;
+        $this->key = static::key();
     }
 
-
-    abstract public function resolveValue(Filters $filters);
+    abstract public function resolveValue(Collection $options, Filters $filters);
 
     abstract public function component(): string;
 
@@ -40,9 +32,14 @@ abstract class Widget
         return Str::title(Str::snake(class_basename(static::class), ' '));
     }
 
-    public function value()
+    public static function key(): string
     {
+        return Str::kebab(class_basename(static::class));
+    }
 
+    public function options(): array
+    {
+        return [];
     }
 
 }

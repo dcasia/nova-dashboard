@@ -14,4 +14,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('{resource}/{id}', [ WidgetController::class, 'fetch' ]);
+Route::post('{resource}/{id}', [ WidgetController::class, 'fetch' ]);

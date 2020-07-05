@@ -30,6 +30,10 @@
  * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
  */
 
+/** gridstack.js 1.1.2 - IE and older browsers Polyfills for this library @preserve*/
+
+/** gridstack.js 1.1.2 - JQuery UI Drag&Drop plugin @preserve */
+
 //! moment.js
 
 //! moment.js language configuration
