@@ -1,5 +1,5 @@
-import Tool from './components/Tool'
-import SocialMediaWidget from './widgets/SocialMediaWidget'
+import NovaWidget from './components/NovaWidget'
+import Widget from './components/Widget'
 
 Nova.booting((Vue, router, store) => {
 
@@ -7,11 +7,11 @@ Nova.booting((Vue, router, store) => {
         {
             name: 'nova-bi',
             path: '/nova-bi/:resource',
-            component: Tool
+            component: NovaWidget
         }
     ])
 
-    Vue.component('social-media-widget', SocialMediaWidget)
+    Vue.component('widget', Widget)
 
 })
 

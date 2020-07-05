@@ -4,8 +4,8 @@ namespace DigitalCreative\NovaBi\Dashboards\Example;
 
 use App\Nova\Filters\TestFilter;
 use DigitalCreative\NovaBi\Dashboards\Dashboard;
-use DigitalCreative\NovaBi\Widgets\SocialMediaWidget;
 use DigitalCreative\NovaBi\Widgets\WidgetPreset;
+use DigitalCreative\SocialMediaWidget\Widgets\SocialMediaWidget;
 
 class ExampleDashboard extends Dashboard
 {

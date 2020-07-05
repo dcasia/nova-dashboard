@@ -1,11 +1,4 @@
 /*!
- * Chart.js v2.9.3
- * https://www.chartjs.org
- * (c) 2019 Chart.js Contributors
- * Released under the MIT License
- */
-
-/*!
  * Determine if an object is a Buffer
  *
  * @author   Feross Aboukhadijeh <https://feross.org>
@@ -33,9 +26,3 @@
 /** gridstack.js 1.1.2 - IE and older browsers Polyfills for this library @preserve*/
 
 /** gridstack.js 1.1.2 - JQuery UI Drag&Drop plugin @preserve */
-
-//! moment.js
-
-//! moment.js language configuration
-
-//! moment.js locale configuration
