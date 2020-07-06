@@ -11,7 +11,7 @@
 <ul class="list-reset mb-8">
     @foreach($dashboards as $resource)
         <li class="leading-tight mb-4 ml-8 text-sm">
-            <router-link :to="{ name: 'nova-bi', params: { resource: '{{ $resource::uriKey() }}' } }" class="text-white text-justify no-underline dim">
+            <router-link :to="{ name: 'nova-widgets', params: { resource: '{{ $resource::uriKey() }}' } }" class="text-white text-justify no-underline dim">
                 {{ $resource::label() }}
             </router-link>
         </li>

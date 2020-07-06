@@ -20,11 +20,6 @@ class ToolServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'nova-bi');
 
-        /**
-         * Config
-         */
-        $this->publishes([ __DIR__ . '/../config/config.php' => config_path('nova-bi.php') ], 'config');
-
         $this->app->booted(function () {
             $this->routes();
         });
@@ -47,7 +42,7 @@ class ToolServiceProvider extends ServiceProvider
         }
 
         Route::middleware([ 'nova', Authorize::class ])
-             ->prefix('nova-vendor/nova-bi')
+             ->prefix('nova-vendor/nova-widgets')
              ->group(__DIR__ . '/../routes/api.php');
     }
 

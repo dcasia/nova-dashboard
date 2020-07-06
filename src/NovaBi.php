@@ -2,6 +2,7 @@
 
 namespace DigitalCreative\NovaBi;
 
+use DigitalCreative\NovaBi\Dashboards\Dashboard;
 use DigitalCreative\NovaBi\Dashboards\Example\ExampleDashboard;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -32,25 +33,7 @@ class NovaBi extends Tool
      */
     public function boot()
     {
-
-        /**
-         * @var NovaRequest $request
-         */
-        $request = resolve(NovaRequest::class);
-
-        $novaPath = Nova::path();
-        $resourceSlug = Str::of($request->getPathInfo())->after("$novaPath/nova-bi/");
-
-        if ($instance = $this->getCurrentActiveDashboard($resourceSlug)) {
-
-            Nova::provideToScript([
-                'nova-bi' => $instance->jsonSerialize()
-            ]);
-
-        }
-
-        Nova::script('nova-bi', __DIR__ . '/../dist/js/tool.js');
-
+        Nova::script('nova-widgets', __DIR__ . '/../dist/js/tool.js');
     }
 
     /**
@@ -63,7 +46,7 @@ class NovaBi extends Tool
         return view('nova-bi::navigation', [ 'dashboards' => $this->dashboards ]);
     }
 
-    public function getCurrentActiveDashboard(string $resourceUri): ?ExampleDashboard
+    public function getCurrentActiveDashboard(string $resourceUri): ?Dashboard
     {
 
         /**

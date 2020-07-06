@@ -5,8 +5,8 @@ Nova.booting((Vue, router, store) => {
 
     router.addRoutes([
         {
-            name: 'nova-bi',
-            path: '/nova-bi/:resource',
+            name: 'nova-widgets',
+            path: '/nova-widgets/:resource',
             component: NovaWidget
         }
     ])

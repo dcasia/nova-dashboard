@@ -1,85 +1,91 @@
 <template>
 
-    <div class="nova-bi">
+    <loading-card :loading="loading" class="nova-bi bg-transparent shadow-none">
 
-        <card class="flex p-4 justify-between" :class="{ 'rounded-b-none': openFilterView }">
+        <div v-if="loading" style="height: 300px"/>
 
-            <div class="flex flex-col justify-center">
-                <h1 class="flex text-90 font-normal text-2xl">{{ title }}</h1>
-                <p class="mt-1 text-90 leading-tight" v-if="subtitle">
-                    {{ subtitle }}
-                </p>
+        <template v-else>
+
+            <card class="flex p-4 justify-between" :class="{ 'rounded-b-none': openFilterView }">
+
+                <div class="flex flex-col justify-center">
+                    <h1 class="flex text-90 font-normal text-2xl">{{ responseData.title }}</h1>
+                    <p class="mt-1 text-90 leading-tight" v-if="responseData.subtitle">
+                        {{ responseData.subtitle }}
+                    </p>
+                </div>
+
+                <div class="flex items-center">
+
+                    <button v-if="options.enableAddWidgetButton" role="button"
+                            class="rounded active:outline-none active:shadow-outline focus:outline-none focus:shadow-outline mr-2"
+                            @click="closeModal = false">
+
+                        <div
+                            class="h-dropdown-trigger text-white font-bold flex items-center cursor-pointer select-none px-3 border-2 border-30 rounded bg-primary border-primary">
+                            Add Widget
+                        </div>
+
+                    </button>
+
+                    <dropdown v-if="responseData.filters.length > 0" @click.native="openFilterView = !openFilterView">
+
+                        <dropdown-trigger class="bg-30 px-3 border-2 border-30 rounded"
+                                          :class="{ 'bg-primary border-primary': openFilterView }"
+                                          :active="openFilterView">
+
+                            <icon type="filter" :class="openFilterView ? 'text-white' : 'text-80'"/>
+
+                            <!--                        <span v-if="openFilterView" class="ml-2 font-bold text-white text-80">-->
+                            <!--                            {{ activeFilterCount }}-->
+                            <!--                        </span>-->
+
+                        </dropdown-trigger>
+
+                    </dropdown>
+
+                </div>
+
+            </card>
+
+            <card v-if="openFilterView" class="flex flex-wrap rounded-t-none border-t border-40">
+
+                <component class="flex flex-col inline-flex w-1/2"
+                           v-for="filter in responseData.filters"
+                           :key="filter.name"
+                           :resource-name="resourceName"
+                           :filter-key="filter.class"
+                           :is="filter.component"
+                           @input="filterChanged"
+                           @change="filterChanged"/>
+
+            </card>
+
+            <div class="grid-stack flex-1 -mx-2 mt-8" ref="grid">
+
+                <div :ref="widget.id" v-for="widget in activeWidgets" :key="widget.id"
+                     @dblclick="editOption(widget)">
+
+                    <component class="grid-stack-item-content" :is="widget.component" :meta="widget"/>
+
+                </div>
+
             </div>
 
-            <div class="flex items-center">
+            <portal to="modals">
 
-                <button role="button"
-                        class="rounded active:outline-none active:shadow-outline focus:outline-none focus:shadow-outline mr-2"
-                        @click="closeModal = false">
+                <create-widget-modal v-if="!closeModal"
+                                     :widgets="responseData.widgets"
+                                     :edit-widget="selectedWidget"
+                                     @close="resetModal"
+                                     @create="addWidget"
+                                     @update="updateWidget"/>
 
-                    <div
-                        class="h-dropdown-trigger text-white font-bold flex items-center cursor-pointer select-none px-3 border-2 border-30 rounded bg-primary border-primary">
-                        Add Widget
-                    </div>
+            </portal>
 
-                </button>
+        </template>
 
-                <dropdown v-if="filters.length > 0" @click.native="openFilterView = !openFilterView">
-
-                    <dropdown-trigger class="bg-30 px-3 border-2 border-30 rounded"
-                                      :class="{ 'bg-primary border-primary': openFilterView }"
-                                      :active="openFilterView">
-
-                        <icon type="filter" :class="openFilterView ? 'text-white' : 'text-80'"/>
-
-                        <!--                        <span v-if="openFilterView" class="ml-2 font-bold text-white text-80">-->
-                        <!--                            {{ activeFilterCount }}-->
-                        <!--                        </span>-->
-
-                    </dropdown-trigger>
-
-                </dropdown>
-
-            </div>
-
-        </card>
-
-        <card v-if="openFilterView" class="flex flex-wrap rounded-t-none border-t border-40">
-
-            <component class="flex flex-col inline-flex w-1/2"
-                       v-for="filter in filters"
-                       :key="filter.name"
-                       :resource-name="resourceName"
-                       :filter-key="filter.class"
-                       :is="filter.component"
-                       @input="filterChanged"
-                       @change="filterChanged"/>
-
-        </card>
-
-        <div class="grid-stack flex-1 -mx-2 mt-8" ref="grid">
-
-            <div :ref="widget.id" v-for="widget in activeWidgets" :key="widget.id"
-                 @dblclick="editOption(widget)">
-
-                <component class="grid-stack-item-content" :is="widget.component" :meta="widget"/>
-
-            </div>
-
-        </div>
-
-        <portal to="modals">
-
-            <create-widget-modal v-if="!closeModal"
-                                 :widgets="widgets"
-                                 :edit-widget="selectedWidget"
-                                 @close="resetModal"
-                                 @create="addWidget"
-                                 @update="updateWidget"/>
-
-        </portal>
-
-    </div>
+    </loading-card>
 
 </template>
 
@@ -90,6 +96,7 @@
     import 'gridstack/dist/gridstack.min.css'
     import 'gridstack/dist/gridstack-extra.css'
     import CreateWidgetModal from './CreateWidgetModal'
+    import { Minimum } from 'laravel-nova'
 
     export default {
         name: 'app',
@@ -97,54 +104,92 @@
         data() {
 
             const resourceName = this.$route.params.resource
-            const { title, subtitle, widgets, presets, filters } = Nova.config[ 'nova-bi' ]
-
-            this.$store.registerModule(resourceName, resource)
-            this.$store.commit(`${ resourceName }/storeFilters`, filters)
 
             return {
-                title,
-                subtitle,
-                filters,
+                loading: true,
                 resourceName,
-                widgets,
-                presets,
+                responseData: null,
                 openFilterView: true,
                 selectedWidget: null,
                 activeWidgets: [],
                 closeModal: true,
-                gridstack: null,
-                idCounter: 10,
-                editMode: false,
-                data: {}
+                gridstack: null
             }
 
         },
-        mounted() {
+        async mounted() {
 
-            const grid = this.gridstack = GridStack.init({ cellHeight: '100px', float: true }, this.$refs.grid)
+            const response = await Minimum(Nova.request().get(`/nova-vendor/nova-widgets/${ this.$route.params.resource }`)).catch(error => error.response)
 
-            grid.on('change', function (event, items) {
-                console.log(items)
-            })
+            if (response.status === 200) {
 
-            for (const preset of this.presets) {
+                this.responseData = response.data
 
-                const widget = this.findWidgetByKey(preset.widget.key)
+                /**
+                 * Initialize Vuex
+                 */
+                this.$store.registerModule(this.resourceName, resource)
+                this.$store.commit(`${ this.resourceName }/storeFilters`, this.responseData.filters)
 
-                this.addWidget(widget, preset.options, preset.coordinates)
+                this.loading = false
+                this.$nextTick(() => this.initialize())
+
+            } else if (response.status === 404) {
+
+                this.$router.push({ name: '404' })
+
+            } else {
+
+                Nova.error(response.data.message)
 
             }
 
+        },
+        computed: {
+            options() {
+                return _.merge({
+                    enableAddWidgetButton: true,
+                    enableWidgetEditing: true,
+                    expandFilterByDefault: true,
+                    gridOptions: {
+                        cellHeight: '100px',
+                        float: true,
+                        staticGrid: false
+                    }
+                }, this.responseData.options)
+            }
         },
         methods: {
+            initialize() {
+
+                const grid = this.gridstack = GridStack.init(this.options.gridOptions, this.$refs.grid)
+
+                this.openFilterView = this.options.expandFilterByDefault
+
+                grid.on('change', function (event, items) {
+                    console.log(items)
+                })
+
+                for (const preset of this.responseData.presets) {
+
+                    const widget = this.findWidgetByKey(preset.widget.key)
+
+                    this.addWidget(widget, preset.options, preset.coordinates)
+
+                }
+
+            },
             findWidgetByKey(key) {
-                return this.widgets.find(widget => widget.key === key)
+                return this.responseData.widgets.find(widget => widget.key === key)
             },
             editOption(widget) {
 
-                this.selectedWidget = widget
-                this.closeModal = false
+                if (this.options.enableWidgetEditing) {
+
+                    this.selectedWidget = widget
+                    this.closeModal = false
+
+                }
 
             },
             filterChanged() {

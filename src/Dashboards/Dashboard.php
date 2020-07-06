@@ -62,6 +62,11 @@ abstract class Dashboard implements JsonSerializable
         return [];
     }
 
+    public function options(): array
+    {
+        return [];
+    }
+
     private function resolveWidgets(): array
     {
 
@@ -140,6 +145,7 @@ abstract class Dashboard implements JsonSerializable
             'filters' => $filters,
             'presets' => $this->resolvePresets($filters),
             'widgets' => $this->resolveWidgets(),
+            'options' => $this->options()
         ];
 
     }

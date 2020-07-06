@@ -48,4 +48,16 @@ class ExampleDashboard extends Dashboard
         ];
     }
 
+    public function options(): array
+    {
+        return [
+            'enableAddWidgetButton' => true,
+            'enableWidgetEditing' => true,
+            'expandFilterByDefault' => true,
+            'gridOptions' => [
+                'staticGrid' => false
+            ]
+        ];
+    }
+
 }

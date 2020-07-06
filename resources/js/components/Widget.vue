@@ -40,7 +40,7 @@
                 this.loading = true
 
                 const response = await Minimum(
-                    Nova.request().post(`/nova-vendor/nova-bi/${ this.meta.uri }/${ this.meta.key }`, {
+                    Nova.request().post(`/nova-vendor/nova-widgets/${ this.meta.uri }/${ this.meta.key }`, {
                         filters: encodedFilters,
                         options: this.meta.options
                     }), 300
