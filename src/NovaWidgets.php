@@ -4,13 +4,11 @@ namespace DigitalCreative\NovaBi;
 
 use DigitalCreative\NovaBi\Dashboards\Dashboard;
 use DigitalCreative\NovaBi\Dashboards\Example\ExampleDashboard;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
-use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Tool;
 
-class NovaBi extends Tool
+class NovaWidgets extends Tool
 {
 
     private array $dashboards;
@@ -23,6 +21,7 @@ class NovaBi extends Tool
     public function __construct(array $dashboards = [])
     {
         $this->dashboards = $dashboards;
+
         parent::__construct(null);
     }
 
@@ -43,7 +42,7 @@ class NovaBi extends Tool
      */
     public function renderNavigation(): View
     {
-        return view('nova-bi::navigation', [ 'dashboards' => $this->dashboards ]);
+        return view('nova-widgets::navigation', [ 'dashboards' => $this->dashboards ]);
     }
 
     public function getCurrentActiveDashboard(string $resourceUri): ?Dashboard

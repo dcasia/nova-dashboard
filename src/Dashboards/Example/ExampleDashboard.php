@@ -34,16 +34,49 @@ class ExampleDashboard extends Dashboard
         return [
 
             WidgetPreset::make(SocialMediaWidget::class)
-                        ->coordinates(4, 0, 4, 2)
+                        ->coordinates(0, 0, 2, 1)
                         ->options([
                             'type' => SocialMediaWidget::TYPE_FACEBOOK
                         ]),
 
             WidgetPreset::make(SocialMediaWidget::class)
-                        ->coordinates(0, 0, 4, 2)
+                        ->coordinates(2, 0, 2, 1)
                         ->options([
                             'type' => SocialMediaWidget::TYPE_TWITTER
                         ]),
+
+            WidgetPreset::make(SocialMediaWidget::class)
+                        ->coordinates(4, 0, 2, 1)
+                        ->options([
+                            'type' => SocialMediaWidget::TYPE_TWITTER
+                        ]),
+//
+//
+//            WidgetPreset::make(SocialMediaWidget::class)
+//                        ->coordinates(0, 0, 4, 2)
+//                        ->options([
+//                            'type' => SocialMediaWidget::TYPE_TWITTER
+//                        ]),
+//
+//            WidgetPreset::make(SocialMediaWidget::class)
+//                        ->coordinates(0, 0, 4, 2)
+//                        ->options([
+//                            'type' => SocialMediaWidget::TYPE_TWITTER
+//                        ]),
+//
+//
+//            WidgetPreset::make(SocialMediaWidget::class)
+//                        ->coordinates(0, 0, 4, 2)
+//                        ->options([
+//                            'type' => SocialMediaWidget::TYPE_TWITTER
+//                        ]),
+//
+//
+//            WidgetPreset::make(SocialMediaWidget::class)
+//                        ->coordinates(0, 0, 4, 2)
+//                        ->options([
+//                            'type' => SocialMediaWidget::TYPE_TWITTER
+//                        ]),
 
         ];
     }

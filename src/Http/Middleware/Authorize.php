@@ -3,7 +3,7 @@
 namespace DigitalCreative\NovaBi\Http\Middleware;
 
 use Laravel\Nova\Nova;
-use DigitalCreative\NovaBi\NovaBi;
+use DigitalCreative\NovaBi\NovaWidgets;
 
 class Authorize
 {
@@ -29,6 +29,6 @@ class Authorize
      */
     public function matchesTool($tool)
     {
-        return $tool instanceof NovaBi;
+        return $tool instanceof NovaWidgets;
     }
 }

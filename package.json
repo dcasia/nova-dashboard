@@ -12,13 +12,13 @@
     "devDependencies": {
         "@babel/runtime": "^7.10.4",
         "cross-env": "^7.0.2",
-        "gridstack": "^1.1.2",
         "laravel-mix": "^5.0.4",
         "laravel-nova": "^1.2.2",
         "lodash": "^4.17.15",
         "sass": "^1.26.9",
         "sass-loader": "^9.0.1",
         "vue": "^2.6.11",
+        "vue-responsive-dash": "^0.4.2",
         "vue-template-compiler": "^2.6.11"
     }
 }

@@ -18,7 +18,7 @@ class ToolServiceProvider extends ServiceProvider
     public function boot()
     {
 
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'nova-bi');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'nova-widgets');
 
         $this->app->booted(function () {
             $this->routes();

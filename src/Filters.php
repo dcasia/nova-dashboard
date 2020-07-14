@@ -74,11 +74,4 @@ class Filters extends FilterDecoder
 
     }
 
-//    public function encodeFilter()
-//    {
-//
-//        $this->filters
-//
-//    }
-
 }

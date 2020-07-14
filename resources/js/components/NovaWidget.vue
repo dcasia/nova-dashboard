@@ -61,16 +61,18 @@
 
             </card>
 
-            <div class="grid-stack flex-1 -mx-2 mt-8" ref="grid">
+            <grid class="grid-stack flex-1 -mx-2 mt-8" :widgets="activeWidgets"/>
 
-                <div :ref="widget.id" v-for="widget in activeWidgets" :key="widget.id"
-                     @dblclick="editOption(widget)">
+            <!--            <div class="grid-stack flex-1 -mx-2 mt-8" ref="grid">-->
 
-                    <component class="grid-stack-item-content" :is="widget.component" :meta="widget"/>
+            <!--                <div :ref="widget.id" v-for="widget in activeWidgets" :key="widget.id"-->
+            <!--                     @dblclick="editOption(widget)">-->
 
-                </div>
+            <!--                    <component class="grid-stack-item-content" :is="widget.component" :meta="widget"/>-->
 
-            </div>
+            <!--                </div>-->
+
+            <!--            </div>-->
 
             <portal to="modals">
 
@@ -92,15 +94,13 @@
 <script>
 
     import resource from '~~nova~~/store/resources'
-    import 'gridstack/dist/gridstack.all'
-    import 'gridstack/dist/gridstack.min.css'
-    import 'gridstack/dist/gridstack-extra.css'
     import CreateWidgetModal from './CreateWidgetModal'
     import { Minimum } from 'laravel-nova'
+    import Grid from './Grid'
 
     export default {
-        name: 'app',
-        components: { CreateWidgetModal },
+        name: 'Widget',
+        components: { CreateWidgetModal, Grid },
         data() {
 
             const resourceName = this.$route.params.resource
@@ -112,8 +112,7 @@
                 openFilterView: true,
                 selectedWidget: null,
                 activeWidgets: [],
-                closeModal: true,
-                gridstack: null
+                closeModal: true
             }
 
         },
@@ -162,13 +161,7 @@
         methods: {
             initialize() {
 
-                const grid = this.gridstack = GridStack.init(this.options.gridOptions, this.$refs.grid)
-
                 this.openFilterView = this.options.expandFilterByDefault
-
-                grid.on('change', function (event, items) {
-                    console.log(items)
-                })
 
                 for (const preset of this.responseData.presets) {
 
@@ -216,32 +209,11 @@
             },
             addWidget(widget, options, coordinates = null) {
 
-                const id = Date.now()
+                const id = Date.now() * Math.random()
 
-                this.activeWidgets.push({ ...widget, id, options: options })
+                this.activeWidgets.push({ ...widget, id, options, coordinates })
 
-                this.$nextTick(() => {
-
-                    const grid = this.gridstack
-                    const widget = this.$refs[ id ]
-
-                    grid.makeWidget(widget)
-
-                    grid.minWidth(widget, 2)
-                    grid.minHeight(widget, 2)
-
-                    if (coordinates) {
-
-                        grid.move(widget, coordinates.x, coordinates.y)
-                        grid.resize(widget, coordinates.width, coordinates.height)
-
-                    }
-
-                    grid.compact()
-
-                    this.resetModal()
-
-                })
+                this.$nextTick(() => this.resetModal())
 
             }
         }

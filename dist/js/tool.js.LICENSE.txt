@@ -1,4 +1,13 @@
 /*!
+     * Strongly Typed Events for TypeScript - Core
+     * https://github.com/KeesCBakker/StronlyTypedEvents/
+     * http://keestalkstech.com
+     *
+     * Copyright Kees C. Bakker / KeesTalksTech
+     * Released under the MIT license
+     */
+
+/*!
  * Determine if an object is a Buffer
  *
  * @author   Feross Aboukhadijeh <https://feross.org>
@@ -22,7 +31,3 @@
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
  * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
  */
-
-/** gridstack.js 1.1.2 - IE and older browsers Polyfills for this library @preserve*/
-
-/** gridstack.js 1.1.2 - JQuery UI Drag&Drop plugin @preserve */
