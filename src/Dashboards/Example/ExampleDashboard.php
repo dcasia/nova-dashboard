@@ -50,33 +50,6 @@ class ExampleDashboard extends Dashboard
                         ->options([
                             'type' => SocialMediaWidget::TYPE_TWITTER
                         ]),
-//
-//
-//            WidgetPreset::make(SocialMediaWidget::class)
-//                        ->coordinates(0, 0, 4, 2)
-//                        ->options([
-//                            'type' => SocialMediaWidget::TYPE_TWITTER
-//                        ]),
-//
-//            WidgetPreset::make(SocialMediaWidget::class)
-//                        ->coordinates(0, 0, 4, 2)
-//                        ->options([
-//                            'type' => SocialMediaWidget::TYPE_TWITTER
-//                        ]),
-//
-//
-//            WidgetPreset::make(SocialMediaWidget::class)
-//                        ->coordinates(0, 0, 4, 2)
-//                        ->options([
-//                            'type' => SocialMediaWidget::TYPE_TWITTER
-//                        ]),
-//
-//
-//            WidgetPreset::make(SocialMediaWidget::class)
-//                        ->coordinates(0, 0, 4, 2)
-//                        ->options([
-//                            'type' => SocialMediaWidget::TYPE_TWITTER
-//                        ]),
 
         ];
     }
@@ -87,8 +60,8 @@ class ExampleDashboard extends Dashboard
             'enableAddWidgetButton' => true,
             'enableWidgetEditing' => true,
             'expandFilterByDefault' => true,
-            'gridOptions' => [
-                'staticGrid' => false
+            'grid' => [
+                'compact' => true,
             ]
         ];
     }

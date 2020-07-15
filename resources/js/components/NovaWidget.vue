@@ -61,18 +61,7 @@
 
             </card>
 
-            <grid class="grid-stack flex-1 -mx-2 mt-8" :widgets="activeWidgets"/>
-
-            <!--            <div class="grid-stack flex-1 -mx-2 mt-8" ref="grid">-->
-
-            <!--                <div :ref="widget.id" v-for="widget in activeWidgets" :key="widget.id"-->
-            <!--                     @dblclick="editOption(widget)">-->
-
-            <!--                    <component class="grid-stack-item-content" :is="widget.component" :meta="widget"/>-->
-
-            <!--                </div>-->
-
-            <!--            </div>-->
+            <grid :options="options.grid" class="grid-stack flex-1 -mx-2 mt-8" :widgets="activeWidgets" @edit="editOption"/>
 
             <portal to="modals">
 
@@ -118,7 +107,9 @@
         },
         async mounted() {
 
-            const response = await Minimum(Nova.request().get(`/nova-vendor/nova-widgets/${ this.$route.params.resource }`)).catch(error => error.response)
+            const response = await Minimum(Nova.request()
+                .get(`/nova-vendor/nova-widgets/${ this.$route.params.resource }`))
+                .catch(error => error.response)
 
             if (response.status === 200) {
 
@@ -150,10 +141,12 @@
                     enableAddWidgetButton: true,
                     enableWidgetEditing: true,
                     expandFilterByDefault: true,
-                    gridOptions: {
-                        cellHeight: '100px',
-                        float: true,
-                        staticGrid: false
+                    grid: {
+                        useCssTransforms: true,
+                        breakpoint: 'none',
+                        numberOfCols: 6,
+                        compact: false,
+                        breakpointWidth: Infinity
                     }
                 }, this.responseData.options)
             }

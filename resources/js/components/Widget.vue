@@ -39,8 +39,13 @@
 
                 this.loading = true
 
+                const url = `/nova-vendor/nova-widgets/${ this.meta.uri }/${ this.meta.key }`;
+                // const url = `/nova-vendor/nova-widgets/card/users`;
+
+                // console.log(this.$store.getters[ `users/currentEncodedFilters`])
+
                 const response = await Minimum(
-                    Nova.request().post(`/nova-vendor/nova-widgets/${ this.meta.uri }/${ this.meta.key }`, {
+                    Nova.request().post(url, {
                         filters: encodedFilters,
                         options: this.meta.options
                     }), 300

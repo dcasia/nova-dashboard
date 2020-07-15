@@ -11,6 +11,17 @@ use Laravel\Nova\Nova;
 class WidgetController
 {
 
+    public function resolveCardResource(NovaRequest $request)
+    {
+        /**
+         * @var \DigitalCreative\NovaBi\Widgets\WidgetCard $first
+         */
+        $first = $request->newResource()->cards($request)[ 0 ];
+
+        return $first->instance->resolveValue(collect(), new Filters(''));
+
+    }
+
     public function resource(string $resource, NovaRequest $request)
     {
 
