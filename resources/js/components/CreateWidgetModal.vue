@@ -42,6 +42,18 @@
 
             <div class="bg-30 px-6 py-3 flex">
 
+                <button v-if="editWidget"
+                        ref="confirmButton"
+                        id="confirm-delete-button"
+                        data-testid="confirm-button"
+                        type="submit"
+                        @click.prevent="handleDelete"
+                        class="btn btn-default btn-danger">
+
+                    {{ __('Delete') }}
+
+                </button>
+
                 <div class="ml-auto">
 
                     <button type="button"
@@ -61,6 +73,7 @@
                         {{ editWidget ? __('Update') : __('Create') }}
 
                     </button>
+
                 </div>
 
             </div>
@@ -149,8 +162,15 @@
             }
         },
         methods: {
+            handleDelete(){
+
+                this.$emit('delete', this.editWidget)
+
+            },
             handleClose() {
+
                 this.$emit('close')
+
             },
             onWidgetSelected() {
 
@@ -169,7 +189,19 @@
 
                 const options = {}
 
-                formData.forEach((value, key) => ( options[ key ] = value ))
+                formData.forEach((value, key) => {
+
+                    try {
+
+                        options[ key ] = JSON.parse(value)
+
+                    } catch (e) {
+
+                        options[ key ] = value
+
+                    }
+
+                })
 
                 if (this.editWidget) {
 
@@ -182,7 +214,9 @@
                 }
 
             }
+
         }
+
     }
 
 </script>

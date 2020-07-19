@@ -4,12 +4,65 @@ namespace DigitalCreative\NovaBi\Http\Controllers;
 
 use DigitalCreative\NovaBi\Dashboards\Dashboard;
 use DigitalCreative\NovaBi\Filters;
+use DigitalCreative\NovaBi\Models\WidgetModel;
 use DigitalCreative\NovaBi\NovaWidgets;
+use Illuminate\Database\Eloquent\Builder;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
 
 class WidgetController
 {
+
+    private function resolveWidget(int $id, array $where = null): WidgetModel
+    {
+
+        /**
+         * @var Builder $query
+         */
+        $modelClass = config('nova-widgets.widget_model');
+        $query = $modelClass::query();
+
+        /**
+         * @var WidgetModel $widgetInstance
+         */
+        $widgetInstance = $query
+            ->when($where, function (Builder $builder) use ($where) {
+                $builder->where($where);
+            })
+            ->find($id);
+
+        if ($widgetInstance === null) {
+
+            return resolve($modelClass);
+
+        }
+
+        return $widgetInstance;
+
+    }
+
+    public function deleteWidget(string $dashboard, NovaRequest $request): bool
+    {
+
+        $widgetInstance = $this->resolveWidget($request->input('id'), compact('dashboard'));
+
+        return (bool) $widgetInstance->delete();
+
+    }
+
+    public function updateWidget(string $dashboard, NovaRequest $request): int
+    {
+
+        $widgetInstance = $this->resolveWidget($request->input('id'));
+        $widgetInstance->setAttribute('dashboard', $dashboard);
+        $widgetInstance->setAttribute('key', $request->input('key'));
+        $widgetInstance->setAttribute('options', $request->input('options'));
+        $widgetInstance->setAttribute('coordinates', $request->input('coordinates'));
+        $widgetInstance->save();
+
+        return $widgetInstance->id;
+
+    }
 
     public function resolveCardResource(NovaRequest $request)
     {

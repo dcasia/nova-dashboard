@@ -3,8 +3,11 @@
 namespace DigitalCreative\NovaBi\Dashboards;
 
 use DigitalCreative\NovaBi\Filters;
+use DigitalCreative\NovaBi\Models\WidgetModel;
+use DigitalCreative\NovaBi\Widgets\Value;
 use DigitalCreative\NovaBi\Widgets\Widget;
 use DigitalCreative\NovaBi\Widgets\WidgetPreset;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use JsonSerializable;
@@ -111,12 +114,45 @@ abstract class Dashboard implements JsonSerializable
 
     }
 
+    public function resolveWidgetData(array $availableFilters): Collection
+    {
+
+        /**
+         * @var Builder $query
+         */
+        $modelClass = config('nova-widgets.widget_model');
+        $query = $modelClass::query();
+
+        return $query->where('dashboard', self::uriKey())
+                     ->get()
+                     ->map(function (WidgetModel $model) use ($availableFilters) {
+
+                         if ($widget = $this->findWidgetByKey($model->key)) {
+
+                             return $widget::fromModel($model, $availableFilters);
+
+                         }
+
+                         return null;
+
+                     })
+                     ->filter();
+
+    }
+
     public function resolveFilters(): array
     {
         return $this->filters();
     }
 
-    public function resolveData(string $key, Collection $options, Filters $filters): array
+    /**
+     * @param string $key
+     * @param Collection $options
+     * @param Filters $filters
+     *
+     * @return mixed
+     */
+    public function resolveData(string $key, Collection $options, Filters $filters): Value
     {
 
         if ($widget = $this->findWidgetByKey($key)) {
@@ -125,7 +161,7 @@ abstract class Dashboard implements JsonSerializable
 
         }
 
-        return [];
+        return new Value;
 
     }
 
@@ -143,6 +179,7 @@ abstract class Dashboard implements JsonSerializable
             'title' => $this->title(),
             'subtitle' => $this->subtitle(),
             'filters' => $filters,
+            'data' => $this->resolveWidgetData($filters),
             'presets' => $this->resolvePresets($filters),
             'widgets' => $this->resolveWidgets(),
             'options' => $this->options()

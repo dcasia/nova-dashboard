@@ -18,7 +18,7 @@
         "sass": "^1.26.9",
         "sass-loader": "^9.0.1",
         "vue": "^2.6.11",
-        "vue-responsive-dash": "^0.4.2",
+        "vue-responsive-dash": "^0.4.3",
         "vue-template-compiler": "^2.6.11"
     }
 }

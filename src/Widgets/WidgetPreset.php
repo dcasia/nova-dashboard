@@ -52,7 +52,7 @@ class WidgetPreset
 
         return [
             'widget' => $widget,
-            'options' => $this->options,
+            'options' => array_merge($widget->resolveOptions(), $this->options),
             'coordinates' => [
                 'x' => $this->x,
                 'y' => $this->y,

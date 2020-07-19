@@ -1,7 +1,11 @@
 <template>
 
-    <loading-card :loading="loading" class="flex flex-col w-full rounded justify-between">
-        <slot v-bind="$data"/>
+    <loading-card :loading="loading"
+                  class="flex flex-col w-full rounded justify-between"
+                  :class="{ 'px-6 py-4': !noPadding }">
+
+        <slot v-if="loading === false" v-bind="$data"/>
+
     </loading-card>
 
 </template>
@@ -12,7 +16,10 @@
 
     export default {
         name: 'Widget',
-        props: [ 'meta' ],
+        props: {
+            meta: { type: Object, required: true },
+            noPadding: { type: Boolean, default: false }
+        },
         data() {
             return {
                 loading: true,
@@ -39,7 +46,7 @@
 
                 this.loading = true
 
-                const url = `/nova-vendor/nova-widgets/${ this.meta.uri }/${ this.meta.key }`;
+                const url = `/nova-vendor/nova-widgets/${ this.meta.uri }/${ this.meta.key }`
                 // const url = `/nova-vendor/nova-widgets/card/users`;
 
                 // console.log(this.$store.getters[ `users/currentEncodedFilters`])

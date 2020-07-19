@@ -3,8 +3,11 @@
 namespace DigitalCreative\NovaBi\Widgets;
 
 use DigitalCreative\NovaBi\Filters;
+use DigitalCreative\NovaBi\Models\WidgetModel;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use JsonException;
+use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Makeable;
 use Laravel\Nova\Metable;
 
@@ -23,7 +26,7 @@ abstract class Widget
         $this->key = static::key();
     }
 
-    abstract public function resolveValue(Collection $options, Filters $filters);
+    abstract public function resolveValue(Collection $options, Filters $filters): Value;
 
     abstract public function component(): string;
 
@@ -40,6 +43,56 @@ abstract class Widget
     public function options(): array
     {
         return [];
+    }
+
+    public function disableEditingSettings(): self
+    {
+        return $this->withMeta([ 'disableEditingSettings' => true ]);
+    }
+
+    public function help(string $text): self
+    {
+        return $this->withMeta([ 'help' => $text ]);
+    }
+
+    public function resolveOptions(): array
+    {
+
+        $options = [];
+
+        /**
+         * @var Field $option
+         */
+        foreach ($this->options() as $option) {
+
+            $options[ $option->attribute ] = $option->value ?? $option->jsonSerialize()[ 'value' ] ?? null;
+
+        }
+
+        return $options;
+
+    }
+
+    /**
+     * @param WidgetModel $model
+     * @param array $filters
+     *
+     * @return array
+     * @throws JsonException
+     */
+    public static function fromModel(WidgetModel $model, array $filters): array
+    {
+
+        $instance = new static();
+
+        return [
+            'id' => $model->id,
+            'widget' => $instance,
+            'options' => $model->options,
+            'coordinates' => $model->coordinates,
+            'data' => $instance->resolveValue($model->options, Filters::fromUnencodedFilters($filters))
+        ];
+
     }
 
 }

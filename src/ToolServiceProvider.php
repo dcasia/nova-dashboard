@@ -15,10 +15,21 @@ class ToolServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
 
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'nova-widgets');
+
+        /**
+         * Migrations
+         */
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->publishes([ __DIR__ . '/../database/migrations' => database_path('migrations'), ], 'migrations');
+
+        /**
+         * Config
+         */
+        $this->publishes([ __DIR__ . '/../config/config.php' => config_path('nova-widgets.php') ], 'config');
 
         $this->app->booted(function () {
             $this->routes();
@@ -35,7 +46,7 @@ class ToolServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function routes()
+    protected function routes(): void
     {
         if ($this->app->routesAreCached()) {
             return;
@@ -51,8 +62,8 @@ class ToolServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
-        //
+        $this->mergeConfigFrom(dirname(__DIR__) . '/config/config.php', 'nova-widgets');
     }
 }

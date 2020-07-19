@@ -15,5 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('{resource}', [ WidgetController::class, 'resource' ]);
+Route::post('/update/{resource}', [ WidgetController::class, 'updateWidget' ]);
+Route::post('/delete/{resource}', [ WidgetController::class, 'deleteWidget' ]);
 Route::post('/card/{resource}', [ WidgetController::class, 'resolveCardResource' ]);
 Route::post('{resource}/{id}', [ WidgetController::class, 'fetch' ]);
