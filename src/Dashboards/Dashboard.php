@@ -60,7 +60,7 @@ abstract class Dashboard implements JsonSerializable
         return [];
     }
 
-    public function preset(): array
+    public function presets(): array
     {
         return [];
     }
@@ -87,7 +87,7 @@ abstract class Dashboard implements JsonSerializable
                 'text' => $widget->name(),
                 'component' => $widget->component(),
                 'data' => $widget->meta(),
-                'options' => $widget->options()
+                'options' => $widget->options(),
             ];
 
         }
@@ -96,25 +96,25 @@ abstract class Dashboard implements JsonSerializable
 
     }
 
-    public function resolvePresets(array $availableFilters): array
+    public function resolveDataFromPresets(array $presets, array $availableFilters): array
     {
 
-        $presets = [];
+        $collection = [];
 
         /**
          * @var WidgetPreset $preset
          */
-        foreach ($this->preset() as $preset) {
+        foreach ($presets as $preset) {
 
-            $presets[] = $preset->instantiate($availableFilters);
+            $collection[] = $preset->instantiate($availableFilters);
 
         }
 
-        return $presets;
+        return $collection;
 
     }
 
-    public function resolveWidgetData(array $availableFilters): Collection
+    public function resolveDataFromDatabase(array $availableFilters): Collection
     {
 
         /**
@@ -152,7 +152,7 @@ abstract class Dashboard implements JsonSerializable
      *
      * @return mixed
      */
-    public function resolveData(string $key, Collection $options, Filters $filters): Value
+    public function resolveValue(string $key, Collection $options, Filters $filters): Value
     {
 
         if ($widget = $this->findWidgetByKey($key)) {
@@ -174,15 +174,17 @@ abstract class Dashboard implements JsonSerializable
     {
 
         $filters = $this->resolveFilters();
+        $presets = $this->presets();
+        $usePreset = filled($presets);
 
         return [
             'title' => $this->title(),
             'subtitle' => $this->subtitle(),
             'filters' => $filters,
-            'data' => $this->resolveWidgetData($filters),
-            'presets' => $this->resolvePresets($filters),
+            'data' => $usePreset ? $this->resolveDataFromPresets($presets, $filters) : $this->resolveDataFromDatabase($filters),
+            'usePreset' => $usePreset,
             'widgets' => $this->resolveWidgets(),
-            'options' => $this->options()
+            'options' => $this->options(),
         ];
 
     }

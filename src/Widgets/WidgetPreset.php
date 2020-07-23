@@ -3,6 +3,7 @@
 namespace DigitalCreative\NovaBi\Widgets;
 
 use DigitalCreative\NovaBi\Filters;
+use Illuminate\Support\Str;
 use Laravel\Nova\Makeable;
 
 class WidgetPreset
@@ -43,24 +44,26 @@ class WidgetPreset
         return $this;
     }
 
-    public function instantiate(array $availableFilters = []): array
+    public function instantiate(array $availableFilters = []): WidgetData
     {
+
         /**
          * @var Widget $widget
          */
         $widget = app($this->widget);
 
-        return [
+        return new WidgetData([
+            'id' => Str::random(),
             'widget' => $widget,
             'options' => array_merge($widget->resolveOptions(), $this->options),
             'coordinates' => [
                 'x' => $this->x,
                 'y' => $this->y,
                 'width' => $this->width,
-                'height' => $this->height
+                'height' => $this->height,
             ],
-            'data' => $widget->resolveValue(collect($this->options), $this->resolveFilters($availableFilters))
-        ];
+            'data' => $widget->resolveValue(collect($this->options), $this->resolveFilters($availableFilters)),
+        ]);
 
     }
 

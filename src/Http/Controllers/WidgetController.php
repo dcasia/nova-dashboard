@@ -13,7 +13,7 @@ use Laravel\Nova\Nova;
 class WidgetController
 {
 
-    private function resolveWidget(int $id, array $where = null): WidgetModel
+    private function resolveWidget(string $id, array $where = null): WidgetModel
     {
 
         /**
@@ -98,7 +98,7 @@ class WidgetController
 
             $filters = new Filters($filters, $dashboard->filters());
 
-            return $dashboard->resolveData($key, collect($options), $filters);
+            return $dashboard->resolveValue($key, collect($options), $filters);
 
         }
 

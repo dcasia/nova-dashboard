@@ -11,6 +11,8 @@
                       @resizeEnd="$emit('update', widget)"
                       :id="widget.id"
                       :min-width="1"
+                      :draggable="enableEdit"
+                      :resizable="enableEdit"
                       :resize-handle-size="0">
 
                 <component :is="widget.component"
@@ -18,7 +20,7 @@
                            :coordinates="widget.coordinates"
                            class="grid__content"/>
 
-                <div v-if="widget.data.disableEditingSettings !== true"
+                <div v-if="enableEdit"
                      class="absolute pin-r pin-t m-2 z-20"
                      @click="$emit('edit', widget)">
 
@@ -56,7 +58,7 @@
 
                 </div>
 
-                <template v-slot:resizeBottomRight>
+                <template v-if="enableEdit" v-slot:resizeBottomRight>
                     <div class="grid__resize-handler"/>
                 </template>
 
@@ -74,7 +76,7 @@
 
     export default {
         name: 'Grid',
-        props: [ 'widgets', 'options' ],
+        props: [ 'widgets', 'options', 'enableEdit' ],
         mounted() {
             console.log(this.widgets)
         },
@@ -95,6 +97,7 @@
         width: 100%;
         overflow: hidden;
         border-radius: .5rem;
+        user-select: text;
 
     }
 

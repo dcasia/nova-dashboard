@@ -22,7 +22,7 @@
                             @click="closeModal = false">
 
                         <div
-                            class="h-dropdown-trigger text-white font-bold flex items-center cursor-pointer select-none px-3 border-2 border-30 rounded bg-primary border-primary">
+                                class="h-dropdown-trigger text-white font-bold flex items-center cursor-pointer select-none px-3 border-2 border-30 rounded bg-primary border-primary">
                             Add Widget
                         </div>
 
@@ -49,7 +49,7 @@
                             @click="closeModal = false">
 
                         <div
-                            class="h-dropdown-trigger text-white font-bold flex items-center cursor-pointer select-none px-3 border-2 border-30 rounded bg-primary border-primary">
+                                class="h-dropdown-trigger text-white font-bold flex items-center cursor-pointer select-none px-3 border-2 border-30 rounded bg-primary border-primary">
 
                             <svg xmlns="http://www.w3.org/2000/svg"
                                  viewBox="0 0 24 24"
@@ -85,6 +85,7 @@
             <grid class="grid-stack flex-1 -mx-2 mt-8"
                   :options="options.grid"
                   :widgets="activeWidgets"
+                  :enable-edit="options.enableWidgetEditing && !this.responseData.usePreset"
                   @update="saveWidget"
                   @edit="editOption"/>
 
@@ -221,6 +222,15 @@
 
             },
             async saveWidget(widget) {
+
+                /**
+                 * If the widgets has been initialized in preset mode, do not attempt to persist the data to the database
+                 */
+                if (this.responseData.usePreset) {
+
+                    return
+
+                }
 
                 const response = await Nova.request()
                     .post(`/nova-vendor/nova-widgets/update/${ this.$route.params.resource }`, widget)

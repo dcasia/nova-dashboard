@@ -73,25 +73,31 @@ abstract class Widget
 
     }
 
+
+    public static function preset(int $x, int $y, int $width, int $height): WidgetPreset
+    {
+        return WidgetPreset::make(static::class)->coordinates($x, $y, $width, $height);
+    }
+
     /**
      * @param WidgetModel $model
      * @param array $filters
      *
-     * @return array
      * @throws JsonException
+     * @return WidgetData
      */
-    public static function fromModel(WidgetModel $model, array $filters): array
+    public static function fromModel(WidgetModel $model, array $filters): WidgetData
     {
 
         $instance = new static();
 
-        return [
-            'id' => $model->id,
+        return new WidgetData([
             'widget' => $instance,
+            'id' => $model->id,
             'options' => $model->options,
             'coordinates' => $model->coordinates,
-            'data' => $instance->resolveValue($model->options, Filters::fromUnencodedFilters($filters))
-        ];
+            'data' => $instance->resolveValue($model->options, Filters::fromUnencodedFilters($filters)),
+        ]);
 
     }
 

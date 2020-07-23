@@ -29,7 +29,7 @@ class ExampleDashboard extends Dashboard
         ];
     }
 
-    public function preset(): array
+    public function presets(): array
     {
         return [
 
