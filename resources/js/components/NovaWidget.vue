@@ -22,9 +22,8 @@
                             class="rounded active:outline-none active:shadow-outline focus:outline-none focus:shadow-outline mr-2"
                             @click="closeModal = false">
 
-                        <div
-                                class="h-dropdown-trigger text-white font-bold flex items-center cursor-pointer select-none px-3 border-2 border-30 rounded bg-primary border-primary">
-                            Add Widget
+                        <div class="h-dropdown-trigger text-white font-bold flex items-center cursor-pointer select-none px-3 border-2 border-30 rounded bg-primary border-primary">
+                            {{ __('Add Widget') }}
                         </div>
 
                     </button>
@@ -45,22 +44,14 @@
 
                     </dropdown>
 
-                    <button role="button"
+                    <button v-if="responseData.actions.length > 0"
+                            role="button"
                             class="rounded active:outline-none active:shadow-outline focus:outline-none focus:shadow-outline ml-2"
-                            @click="closeModal = false">
+                            @click="closeActionModal = false">
 
-                        <div
-                                class="h-dropdown-trigger text-white font-bold flex items-center cursor-pointer select-none px-3 border-2 border-30 rounded bg-primary border-primary">
+                        <div class="h-dropdown-trigger text-white font-bold flex items-center cursor-pointer select-none px-3 border-2 border-30 rounded bg-primary border-primary">
 
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 viewBox="0 0 24 24"
-                                 width="24"
-                                 height="24">
-
-                                <path fill="currentColor"
-                                      d="M9 4.58V4c0-1.1.9-2 2-2h2a2 2 0 0 1 2 2v.58a8 8 0 0 1 1.92 1.11l.5-.29a2 2 0 0 1 2.74.73l1 1.74a2 2 0 0 1-.73 2.73l-.5.29a8.06 8.06 0 0 1 0 2.22l.5.3a2 2 0 0 1 .73 2.72l-1 1.74a2 2 0 0 1-2.73.73l-.5-.3A8 8 0 0 1 15 19.43V20a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-.58a8 8 0 0 1-1.92-1.11l-.5.29a2 2 0 0 1-2.74-.73l-1-1.74a2 2 0 0 1 .73-2.73l.5-.29a8.06 8.06 0 0 1 0-2.22l-.5-.3a2 2 0 0 1-.73-2.72l1-1.74a2 2 0 0 1 2.73-.73l.5.3A8 8 0 0 1 9 4.57zM7.88 7.64l-.54.51-1.77-1.02-1 1.74 1.76 1.01-.17.73a6.02 6.02 0 0 0 0 2.78l.17.73-1.76 1.01 1 1.74 1.77-1.02.54.51a6 6 0 0 0 2.4 1.4l.72.2V20h2v-2.04l.71-.2a6 6 0 0 0 2.41-1.4l.54-.51 1.77 1.02 1-1.74-1.76-1.01.17-.73a6.02 6.02 0 0 0 0-2.78l-.17-.73 1.76-1.01-1-1.74-1.77 1.02-.54-.51a6 6 0 0 0-2.4-1.4l-.72-.2V4h-2v2.04l-.71.2a6 6 0 0 0-2.41 1.4zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-2a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
-
-                            </svg>
+                            <icon type="play" class="text-white" style="margin-left: 7px;" />
 
                         </div>
 
@@ -95,7 +86,7 @@
                   @update="saveWidget"
                   @edit="editOption"/>
 
-            <portal to="modals">
+            <portal to="modals" transition="fade-transition">
 
                 <create-widget-modal v-if="!closeModal"
                                      :widgets="responseData.widgets"
@@ -104,6 +95,11 @@
                                      @close="resetModal"
                                      @create="addWidget"
                                      @update="updateWidget"/>
+
+                <action-modal v-if="!closeActionModal"
+                              :dashboard="resourceName"
+                              :actions="responseData.actions"
+                              @close="closeActionModal = true"/>
 
             </portal>
 
@@ -117,13 +113,14 @@
 
     import resource from '~~nova~~/store/resources'
     import CreateWidgetModal from './CreateWidgetModal'
+    import ActionModal from './ActionModal'
     import { Minimum } from 'laravel-nova'
     import Grid from './Grid'
     import { CollapseTransition } from 'vue2-transitions'
 
     export default {
         name: 'Widget',
-        components: { CreateWidgetModal, Grid, CollapseTransition },
+        components: { CreateWidgetModal, Grid, CollapseTransition, ActionModal },
         data() {
 
             const resourceName = this.$route.params.resource
@@ -135,7 +132,8 @@
                 openFilterView: true,
                 selectedWidget: null,
                 activeWidgets: [],
-                closeModal: true
+                closeModal: true,
+                closeActionModal: true
             }
 
         },

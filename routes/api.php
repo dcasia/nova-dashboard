@@ -18,4 +18,6 @@ Route::get('{resource}', [ WidgetController::class, 'resource' ]);
 Route::post('/update/{resource}', [ WidgetController::class, 'updateWidget' ]);
 Route::post('/delete/{resource}', [ WidgetController::class, 'deleteWidget' ]);
 Route::post('/card/{resource}', [ WidgetController::class, 'resolveCardResource' ]);
+Route::post('/action/{dashboard}/{action}', [ WidgetController::class, 'executeAction' ]);
+Route::post('{resource}/{id}', [ WidgetController::class, 'fetch' ]);
 Route::post('{resource}/{id}', [ WidgetController::class, 'fetch' ]);

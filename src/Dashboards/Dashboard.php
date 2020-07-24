@@ -4,6 +4,7 @@ namespace DigitalCreative\NovaBi\Dashboards;
 
 use DigitalCreative\NovaBi\Filters;
 use DigitalCreative\NovaBi\Models\WidgetModel;
+use DigitalCreative\NovaBi\Widgets\Action;
 use DigitalCreative\NovaBi\Widgets\Value;
 use DigitalCreative\NovaBi\Widgets\Widget;
 use DigitalCreative\NovaBi\Widgets\WidgetPreset;
@@ -68,6 +69,11 @@ abstract class Dashboard implements JsonSerializable
     }
 
     public function options(): array
+    {
+        return [];
+    }
+
+    public function actions(): array
     {
         return [];
     }
@@ -141,6 +147,13 @@ abstract class Dashboard implements JsonSerializable
 
     }
 
+    public function findActionByKey(string $key): ?Action
+    {
+        return collect($this->actions())->first(function (Action $action) use ($key) {
+            return $action->uriKey() === $key;
+        });
+    }
+
     public function findWidgetByKey(string $key): ?Widget
     {
         return collect($this->getFlattenedWidgets())->firstWhere('key', $key);
@@ -174,6 +187,7 @@ abstract class Dashboard implements JsonSerializable
             'usePreset' => $usePreset,
             'widgets' => $widgets,
             'options' => $this->options(),
+            'actions' => $this->actions(),
         ];
 
     }

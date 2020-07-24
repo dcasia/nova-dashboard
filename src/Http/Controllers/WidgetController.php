@@ -6,38 +6,60 @@ use DigitalCreative\NovaBi\Dashboards\Dashboard;
 use DigitalCreative\NovaBi\Filters;
 use DigitalCreative\NovaBi\Models\WidgetModel;
 use DigitalCreative\NovaBi\NovaWidgets;
+use DigitalCreative\NovaBi\Widgets\Action;
+use DigitalCreative\NovaBi\Widgets\WidgetCard;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Fluent;
+use Laravel\Nova\Fields\ActionFields;
+use Laravel\Nova\Fields\Field;
+use Laravel\Nova\Http\Requests\ActionRequest;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
 
 class WidgetController
 {
 
-    private function resolveWidget(string $id, array $where = null): WidgetModel
+    public function executeAction(string $dashboard, string $action, ActionRequest $request)
     {
 
-        /**
-         * @var Builder $query
-         */
-        $modelClass = config('nova-widgets.widget_model');
-        $query = $modelClass::query();
+        $dashboard = $this->findDashboard($request, $dashboard);
 
-        /**
-         * @var WidgetModel $widgetInstance
-         */
-        $widgetInstance = $query
-            ->when($where, function (Builder $builder) use ($where) {
-                $builder->where($where);
-            })
-            ->find($id);
+        if (!$dashboard->authorizedToSee($request)) {
 
-        if ($widgetInstance === null) {
-
-            return resolve($modelClass);
+            return Action::danger(__('Sorry! You are not authorized to perform this action.'));
 
         }
 
-        return $widgetInstance;
+        $action = $dashboard->findActionByKey($action);
+        $filters = new Filters($request->input('filters'), $dashboard->filters());
+        $fakeModel = new Fluent;
+        $fields = $action->fields();
+
+        $rules = collect($fields)->mapWithKeys(function (Field $field) {
+            return [ $field->attribute => $field->rules ];
+        });
+
+        /**
+         * Run validation
+         */
+        $request->validate($rules->toArray());
+
+        if (!$action->authorizedToRun($request, $fakeModel) ||
+            !$action->authorizedToSee($request)) {
+
+            return Action::danger(__('Sorry! You are not authorized to perform this action.'));
+
+        }
+
+        $results = collect($action->fields())->mapWithKeys(function (Field $field) use ($request, $fakeModel) {
+            return [ $field->attribute => $field->fillForAction($request, $fakeModel) ];
+        });
+
+        $actionFields = new ActionFields(collect($fakeModel->getAttributes()), $results->filter(function ($field) {
+            return is_callable($field);
+        }));
+
+        return $action->execute($actionFields, $filters);
 
     }
 
@@ -67,7 +89,7 @@ class WidgetController
     public function resolveCardResource(NovaRequest $request)
     {
         /**
-         * @var \DigitalCreative\NovaBi\Widgets\WidgetCard $first
+         * @var WidgetCard $first
          */
         $first = $request->newResource()->cards($request)[ 0 ];
 
@@ -135,6 +157,34 @@ class WidgetController
         }
 
         return null;
+
+    }
+
+    private function resolveWidget(string $id, array $where = null): WidgetModel
+    {
+
+        /**
+         * @var Builder $query
+         */
+        $modelClass = config('nova-widgets.widget_model');
+        $query = $modelClass::query();
+
+        /**
+         * @var WidgetModel $widgetInstance
+         */
+        $widgetInstance = $query
+            ->when($where, function (Builder $builder) use ($where) {
+                $builder->where($where);
+            })
+            ->find($id);
+
+        if ($widgetInstance === null) {
+
+            return resolve($modelClass);
+
+        }
+
+        return $widgetInstance;
 
     }
 
