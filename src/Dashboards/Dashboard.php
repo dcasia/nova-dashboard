@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use JsonSerializable;
 use Laravel\Nova\AuthorizedToSee;
+use Laravel\Nova\Filters\Filter;
 use Laravel\Nova\ProxiesCanSeeToGate;
 
 abstract class Dashboard implements JsonSerializable
@@ -78,7 +79,7 @@ abstract class Dashboard implements JsonSerializable
         return [];
     }
 
-    public function resolveDataFromPresets(array $availableFilters): array
+    public function resolveDataFromPresets(Collection $availableFilters): array
     {
 
         $collection = [];
@@ -96,7 +97,7 @@ abstract class Dashboard implements JsonSerializable
 
     }
 
-    public function resolveDataFromDatabase(array $availableFilters): Collection
+    public function resolveDataFromDatabase(Collection $availableFilters): Collection
     {
 
         /**
@@ -122,9 +123,11 @@ abstract class Dashboard implements JsonSerializable
 
     }
 
-    public function resolveFilters(): array
+    public function resolveFilters(): Collection
     {
-        return $this->filters();
+        return collect($this->filters())->filter(function (Filter $filter) {
+            return $filter->authorizedToSee(request());
+        });
     }
 
     /**
@@ -172,6 +175,13 @@ abstract class Dashboard implements JsonSerializable
         });
     }
 
+    public function resolveActions(): Collection
+    {
+        return collect($this->actions())->filter(function (Action $action) {
+            return $action->authorizedToSee(request());
+        });
+    }
+
     public function jsonSerialize(): array
     {
 
@@ -187,7 +197,7 @@ abstract class Dashboard implements JsonSerializable
             'usePreset' => $usePreset,
             'widgets' => $widgets,
             'options' => $this->options(),
-            'actions' => $this->actions(),
+            'actions' => $this->resolveActions(),
         ];
 
     }

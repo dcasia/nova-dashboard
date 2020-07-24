@@ -18,6 +18,10 @@
 
                 <div class="flex items-center">
 
+                    <h1 class="flex text-60 cursor-pointer hover:text-90 font-normal text-xl mr-4">
+                        {{ responseData.title }}
+                    </h1>
+
                     <button v-if="options.enableAddWidgetButton" role="button"
                             class="rounded active:outline-none active:shadow-outline focus:outline-none focus:shadow-outline mr-2"
                             @click="closeModal = false">

@@ -14,9 +14,17 @@ class Filters extends FilterDecoder
 
     private Collection $filters;
 
-    private function resolvedFilters(): Collection
+    public static function fromUnencodedFilters(Collection $availableFilters): self
     {
-        return $this->filters ?? ($this->filters = $this->filters());
+
+        $result = $availableFilters
+            ->map(function (Filter $filter, string $filterClass) {
+                return [ 'class' => get_class($filter), 'value' => $filter->meta[ 'currentValue' ] ?? null ];
+            })
+            ->values();
+
+        return new self(base64_encode(json_encode($result, JSON_THROW_ON_ERROR)), $availableFilters);
+
     }
 
     public function getFilterValue(string $filterClass, string $name = null)
@@ -63,15 +71,9 @@ class Filters extends FilterDecoder
         });
     }
 
-    public static function fromUnencodedFilters(array $availableFilters): self
+    private function resolvedFilters(): Collection
     {
-
-        $result = collect($availableFilters)
-            ->map(fn(Filter $filter, string $filterClass) => [ 'class' => get_class($filter), 'value' => $filter->meta[ 'currentValue' ] ?? null ])
-            ->values();
-
-        return new self(base64_encode(json_encode($result, JSON_THROW_ON_ERROR)), $availableFilters);
-
+        return $this->filters ?? ($this->filters = $this->filters());
     }
 
 }

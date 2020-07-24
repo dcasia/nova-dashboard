@@ -3,6 +3,7 @@
 namespace DigitalCreative\NovaBi\Widgets;
 
 use DigitalCreative\NovaBi\Filters;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Laravel\Nova\Makeable;
 
@@ -44,7 +45,7 @@ class WidgetPreset
         return $this;
     }
 
-    public function instantiate(array $availableFilters = []): WidgetData
+    public function instantiate(Collection $availableFilters): WidgetData
     {
 
         return new WidgetData([
@@ -62,7 +63,7 @@ class WidgetPreset
 
     }
 
-    private function resolveFilters(array $availableFilters): Filters
+    private function resolveFilters(Collection $availableFilters): Filters
     {
         return Filters::fromUnencodedFilters($availableFilters);
     }

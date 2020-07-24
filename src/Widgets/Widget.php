@@ -80,12 +80,12 @@ abstract class Widget
 
     /**
      * @param WidgetModel $model
-     * @param array $filters
+     * @param Collection $filters
      *
      * @throws JsonException
      * @return WidgetData
      */
-    public static function fromModel(WidgetModel $model, array $filters): WidgetData
+    public static function fromModel(WidgetModel $model, Collection $filters): WidgetData
     {
 
         $instance = new static();
