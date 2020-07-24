@@ -230,7 +230,7 @@
                 })
 
             },
-            debouncer: _.debounce(callback => callback(), 50),
+            debouncer: _.debounce(callback => callback(), 100),
             async saveWidget(widget) {
 
                 /**
