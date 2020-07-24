@@ -3,7 +3,7 @@
 namespace DigitalCreative\NovaBi;
 
 use DigitalCreative\NovaBi\Dashboards\Dashboard;
-use DigitalCreative\NovaBi\Dashboards\Example\ExampleDashboard;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Tool;
@@ -11,7 +11,8 @@ use Laravel\Nova\Tool;
 class NovaWidgets extends Tool
 {
 
-    private array $dashboards;
+    private Collection $dashboards;
+    private bool $useNavigation = true;
 
     /**
      * Create a new element.
@@ -20,9 +21,20 @@ class NovaWidgets extends Tool
      */
     public function __construct(array $dashboards = [])
     {
-        $this->dashboards = $dashboards;
+
+        $this->dashboards = collect($dashboards)->filter(function (Dashboard $dashboard) {
+            return $dashboard->authorizedToSee(request());
+        });
 
         parent::__construct(null);
+
+    }
+
+    public function withoutNavigationMenu(): self
+    {
+        $this->useNavigation = false;
+
+        return $this;
     }
 
     /**
@@ -38,18 +50,26 @@ class NovaWidgets extends Tool
     /**
      * Build the view that renders the navigation links for the tool.
      *
-     * @return View
+     * @return View|null
      */
-    public function renderNavigation(): View
+    public function renderNavigation(): ?View
     {
-        return view('nova-widgets::navigation', [ 'dashboards' => $this->dashboards ]);
+
+        if ($this->dashboards->isNotEmpty() && $this->useNavigation) {
+
+            return view('nova-widgets::navigation', [ 'dashboards' => $this->dashboards ]);
+
+        }
+
+        return null;
+
     }
 
     public function getCurrentActiveDashboard(string $resourceUri): ?Dashboard
     {
 
         /**
-         * @var ExampleDashboard $dashboard
+         * @var Dashboard $dashboard
          */
         foreach ($this->dashboards as $dashboard) {
 

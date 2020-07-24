@@ -67,7 +67,7 @@ class Filters extends FilterDecoder
     {
 
         $result = collect($availableFilters)
-            ->map(fn(Filter $filter, string $filterClass) => [ 'class' => get_class($filter), 'value' => $filter->meta[ 'currentValue' ] ])
+            ->map(fn(Filter $filter, string $filterClass) => [ 'class' => get_class($filter), 'value' => $filter->meta[ 'currentValue' ] ?? null ])
             ->values();
 
         return new self(base64_encode(json_encode($result, JSON_THROW_ON_ERROR)), $availableFilters);

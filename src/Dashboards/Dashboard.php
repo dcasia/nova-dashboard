@@ -11,9 +11,16 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use JsonSerializable;
+use Laravel\Nova\AuthorizedToSee;
+use Laravel\Nova\ProxiesCanSeeToGate;
 
 abstract class Dashboard implements JsonSerializable
 {
+
+    use AuthorizedToSee;
+    use ProxiesCanSeeToGate;
+
+    private array $presets = [];
 
     public static function humanize(string $value): string
     {
@@ -30,16 +37,6 @@ abstract class Dashboard implements JsonSerializable
         return static::humanize(class_basename(static::class));
     }
 
-    public function title(): string
-    {
-        return static::$title ?? static::humanize(class_basename(static::class));
-    }
-
-    public function subtitle(): ?string
-    {
-        return static::$subtitle ?? null;
-    }
-
     /**
      * Get the URI key for the resource.
      *
@@ -48,6 +45,16 @@ abstract class Dashboard implements JsonSerializable
     public static function uriKey(): string
     {
         return Str::kebab(class_basename(static::class));
+    }
+
+    public function title(): string
+    {
+        return static::$title ?? static::humanize(class_basename(static::class));
+    }
+
+    public function subtitle(): ?string
+    {
+        return static::$subtitle ?? null;
     }
 
     public function filters(): array
@@ -60,43 +67,12 @@ abstract class Dashboard implements JsonSerializable
         return [];
     }
 
-    public function presets(): array
-    {
-        return [];
-    }
-
     public function options(): array
     {
         return [];
     }
 
-    private function resolveWidgets(): array
-    {
-
-        $widgets = [];
-        $uri = self::uriKey();
-
-        /**
-         * @var Widget $widget
-         */
-        foreach ($this->widgets() as $widget) {
-
-            $widgets[] = [
-                'key' => $widget->key,
-                'uri' => $uri,
-                'text' => $widget->name(),
-                'component' => $widget->component(),
-                'data' => $widget->meta(),
-                'options' => $widget->options(),
-            ];
-
-        }
-
-        return $widgets;
-
-    }
-
-    public function resolveDataFromPresets(array $presets, array $availableFilters): array
+    public function resolveDataFromPresets(array $availableFilters): array
     {
 
         $collection = [];
@@ -104,7 +80,7 @@ abstract class Dashboard implements JsonSerializable
         /**
          * @var WidgetPreset $preset
          */
-        foreach ($presets as $preset) {
+        foreach ($this->presets as $preset) {
 
             $collection[] = $preset->instantiate($availableFilters);
 
@@ -161,31 +137,88 @@ abstract class Dashboard implements JsonSerializable
 
         }
 
-        return new Value;
+        return new Value(0);
 
     }
 
     public function findWidgetByKey(string $key): ?Widget
     {
-        return collect($this->widgets())->firstWhere('key', $key);
+        return collect($this->getFlattenedWidgets())->firstWhere('key', $key);
+    }
+
+    public function getFlattenedWidgets(): Collection
+    {
+        return once(function () {
+
+            return collect($this->widgets())->map(function ($widget) {
+
+                return $widget instanceof WidgetPreset ? $widget->widget : $widget;
+
+            });
+
+        });
     }
 
     public function jsonSerialize(): array
     {
 
         $filters = $this->resolveFilters();
-        $presets = $this->presets();
-        $usePreset = filled($presets);
+        $widgets = $this->resolveWidgets();
+        $usePreset = filled($this->presets);
 
         return [
             'title' => $this->title(),
             'subtitle' => $this->subtitle(),
             'filters' => $filters,
-            'data' => $usePreset ? $this->resolveDataFromPresets($presets, $filters) : $this->resolveDataFromDatabase($filters),
+            'data' => $usePreset ? $this->resolveDataFromPresets($filters) : $this->resolveDataFromDatabase($filters),
             'usePreset' => $usePreset,
-            'widgets' => $this->resolveWidgets(),
+            'widgets' => $widgets,
             'options' => $this->options(),
         ];
+
+    }
+
+    private function resolveWidgets(): array
+    {
+
+        $widgets = [];
+        $uri = self::uriKey();
+
+        /**
+         * @var Widget|WidgetPreset $widget
+         */
+        foreach ($this->widgets() as $widget) {
+
+            if ($widget instanceof WidgetPreset) {
+
+                $this->presets[] = $widget;
+                $widget = $widget->widget;
+
+            }
+
+            $widgetClassName = get_class($widget);
+
+            /**
+             * Ignore duplicated definitions
+             */
+            if (isset($widgets[ $widgetClassName ])) {
+
+                continue;
+
+            }
+
+            $widgets[ $widgetClassName ] = [
+                'key' => $widget->key,
+                'uri' => $uri,
+                'text' => $widget->name(),
+                'component' => $widget->component(),
+                'data' => $widget->meta(),
+                'options' => $widget->options(),
+            ];
+
+        }
+
+        return array_values($widgets);
 
     }
 

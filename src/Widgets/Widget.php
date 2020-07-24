@@ -73,7 +73,6 @@ abstract class Widget
 
     }
 
-
     public static function preset(int $x, int $y, int $width, int $height): WidgetPreset
     {
         return WidgetPreset::make(static::class)->coordinates($x, $y, $width, $height);

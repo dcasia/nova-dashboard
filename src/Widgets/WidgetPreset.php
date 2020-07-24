@@ -15,16 +15,16 @@ class WidgetPreset
     public int $y = 0;
     public int $width = 0;
     public int $height = 0;
-    public string $widget;
+    public Widget $widget;
 
     /**
      * PresetWidget constructor.
      *
-     * @param string $widget
+     * @param string|Widget $widget
      */
-    public function __construct(string $widget)
+    public function __construct($widget)
     {
-        $this->widget = $widget;
+        $this->widget = $widget instanceof Widget ? $widget : resolve($widget);
     }
 
     public function options(array $options): self
@@ -47,22 +47,17 @@ class WidgetPreset
     public function instantiate(array $availableFilters = []): WidgetData
     {
 
-        /**
-         * @var Widget $widget
-         */
-        $widget = app($this->widget);
-
         return new WidgetData([
             'id' => Str::random(),
-            'widget' => $widget,
-            'options' => array_merge($widget->resolveOptions(), $this->options),
+            'widget' => $this->widget,
+            'options' => array_merge($this->widget->resolveOptions(), $this->options),
             'coordinates' => [
                 'x' => $this->x,
                 'y' => $this->y,
                 'width' => $this->width,
                 'height' => $this->height,
             ],
-            'data' => $widget->resolveValue(collect($this->options), $this->resolveFilters($availableFilters)),
+            'data' => $this->widget->resolveValue(collect($this->options), $this->resolveFilters($availableFilters)),
         ]);
 
     }

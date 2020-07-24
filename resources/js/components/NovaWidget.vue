@@ -6,9 +6,10 @@
 
         <template v-else>
 
-            <card class="flex p-4 justify-between" :class="{ 'rounded-b-none': openFilterView }">
+            <card class="flex p-4 justify-between nova-bi__menu"
+                  :class="{ 'rounded-b-none': openFilterView, 'p-8': openFilterView }">
 
-                <div class="flex flex-col justify-center">
+                <div class="flex flex-col justify-center px-2">
                     <h1 class="flex text-90 font-normal text-2xl">{{ responseData.title }}</h1>
                     <p class="mt-1 text-90 leading-tight" v-if="responseData.subtitle">
                         {{ responseData.subtitle }}
@@ -69,18 +70,23 @@
 
             </card>
 
-            <card v-if="openFilterView" class="flex flex-wrap rounded-t-none border-t border-40">
+            <CollapseTransition :duration="250">
 
-                <component class="flex flex-col inline-flex w-1/2"
-                           v-for="filter in responseData.filters"
-                           :key="filter.name"
-                           :resource-name="resourceName"
-                           :filter-key="filter.class"
-                           :is="filter.component"
-                           @input="filterChanged"
-                           @change="filterChanged"/>
+                <card v-if="openFilterView"
+                      class="nova-bi__filter-container flex flex-wrap rounded-t-none border-t border-40 bg-30">
 
-            </card>
+                    <component class="nova-bi__filter flex flex-col inline-flex w-1/2"
+                               v-for="filter in responseData.filters"
+                               :key="filter.name"
+                               :resource-name="resourceName"
+                               :filter-key="filter.class"
+                               :is="filter.component"
+                               @input="filterChanged"
+                               @change="filterChanged"/>
+
+                </card>
+
+            </CollapseTransition>
 
             <grid class="grid-stack flex-1 -mx-2 mt-8"
                   :options="options.grid"
@@ -113,10 +119,11 @@
     import CreateWidgetModal from './CreateWidgetModal'
     import { Minimum } from 'laravel-nova'
     import Grid from './Grid'
+    import { CollapseTransition } from 'vue2-transitions'
 
     export default {
         name: 'Widget',
-        components: { CreateWidgetModal, Grid },
+        components: { CreateWidgetModal, Grid, CollapseTransition },
         data() {
 
             const resourceName = this.$route.params.resource
@@ -321,6 +328,30 @@
         width: 100%;
         height: 100%;
         display: block;
+    }
+
+    .nova-bi__menu {
+
+        transition: border-radius 50ms 200ms, padding 250ms;
+
+        &.rounded-b-none {
+
+            transition: border-radius 0ms 0ms, padding 250ms;
+
+        }
+
+    }
+
+    .nova-bi__filter-container > .nova-bi__filter:last-child {
+
+        padding-bottom: 1.5rem;
+
+    }
+
+    .nova-bi__filter {
+        padding-top: 1rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
     }
 
 </style>
