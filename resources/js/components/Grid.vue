@@ -77,9 +77,6 @@
     export default {
         name: 'Grid',
         props: [ 'widgets', 'options', 'enableEdit' ],
-        mounted() {
-            console.log(this.widgets)
-        },
         components: {
             Dashboard,
             DashLayout,

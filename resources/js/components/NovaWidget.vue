@@ -225,9 +225,12 @@
             },
             filterChanged() {
 
-                Nova.$emit('NovaFilterUpdate', this.$store.getters[ `${ this.resourceName }/currentEncodedFilters` ])
+                this.debouncer(() => {
+                    Nova.$emit('NovaFilterUpdate', this.$store.getters[ `${ this.resourceName }/currentEncodedFilters` ])
+                })
 
             },
+            debouncer: _.debounce(callback => callback(), 50),
             async saveWidget(widget) {
 
                 /**
