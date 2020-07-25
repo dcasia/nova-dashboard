@@ -4,7 +4,7 @@ namespace DigitalCreative\NovaBi\Dashboards\Example;
 
 use App\Nova\Filters\TestFilter;
 use DigitalCreative\NovaBi\Dashboards\Dashboard;
-use DigitalCreative\NovaBi\Widgets\WidgetPreset;
+use DigitalCreative\NovaBi\Widgets\Preset;
 use DigitalCreative\SocialMediaWidget\Widgets\SocialMediaWidget;
 
 class ExampleDashboard extends Dashboard
@@ -33,19 +33,19 @@ class ExampleDashboard extends Dashboard
     {
         return [
 
-            WidgetPreset::make(SocialMediaWidget::class)
+            Preset::make(SocialMediaWidget::class)
                         ->coordinates(0, 0, 2, 1)
                         ->options([
                             'type' => SocialMediaWidget::TYPE_FACEBOOK
                         ]),
 
-            WidgetPreset::make(SocialMediaWidget::class)
+            Preset::make(SocialMediaWidget::class)
                         ->coordinates(2, 0, 2, 1)
                         ->options([
                             'type' => SocialMediaWidget::TYPE_TWITTER
                         ]),
 
-            WidgetPreset::make(SocialMediaWidget::class)
+            Preset::make(SocialMediaWidget::class)
                         ->coordinates(4, 0, 2, 1)
                         ->options([
                             'type' => SocialMediaWidget::TYPE_TWITTER

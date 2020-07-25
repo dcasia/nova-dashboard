@@ -4,7 +4,9 @@
                   class="flex flex-col w-full rounded justify-between"
                   :class="{ 'px-6 py-4': !noPadding }">
 
-        <slot v-if="loading === false" v-bind="$data"/>
+        <FadeTransition>
+            <slot v-if="loading === false" v-bind="$data"/>
+        </FadeTransition>
 
     </loading-card>
 
@@ -13,9 +15,11 @@
 <script>
 
     import { Minimum } from 'laravel-nova'
+    import { FadeTransition } from 'vue2-transitions'
 
     export default {
         name: 'Widget',
+        components: { FadeTransition },
         props: {
             meta: { type: Object, required: true },
             noPadding: { type: Boolean, default: false }
@@ -28,38 +32,60 @@
         },
         async created() {
 
-            const callback = encodedFilters => this.fetchData(encodedFilters)
+            const callback = widget => this.fetchData(widget)
 
             Nova.$on('NovaFilterUpdate', callback)
-            Nova.$on(`widget-${ this.meta.id }-update`, callback)
+            Nova.$on(`widget-${ this.meta.id }-updated`, callback)
 
             this.$on('hook:destroyed', () => {
                 Nova.$off('NovaFilterUpdate', callback)
-                Nova.$off(`widget-${ this.meta.id }-update`, callback)
+                Nova.$off(`widget-${ this.meta.id }-updated`, callback)
             })
 
-            await this.fetchData()
+        },
+        async mounted() {
+
+            await this.fetchData(this.meta)
 
         },
         methods: {
-            async fetchData(encodedFilters = null) {
+            async fetchData(widget) {
 
                 this.loading = true
 
-                const url = `/nova-vendor/nova-widgets/${ this.meta.uri }/${ this.meta.key }`
-                // const url = `/nova-vendor/nova-widgets/card/users`;
+                const filters = this.$store.getters[ `${ widget.dashboardKey }/currentEncodedFilters` ]
 
-                // console.log(this.$store.getters[ `users/currentEncodedFilters`])
-
-                const response = await Minimum(
-                    Nova.request().post(url, {
-                        filters: encodedFilters,
-                        options: this.meta.options
+                await Minimum(
+                    Nova.request({
+                        method: 'post',
+                        url: '/nova-vendor/nova-widgets/fetch-widget-data',
+                        data: {
+                            dashboard: widget.dashboardKey,
+                            view: widget.viewKey,
+                            widget: widget.widgetKey,
+                            filters: filters,
+                            options: widget.options
+                        }
                     }), 300
-                )
+                ).then(response => {
 
-                this.value = response.data
-                this.loading = false
+                    this.value = response.data
+
+                    this.$nextTick(() => this.loading = false)
+
+                }).catch(error => {
+
+                    try {
+
+                        Nova.error(error.response.data.message)
+
+                    } catch {
+
+                        Nova.error(this.__('Failed to load :widget.', { 'widget': widget.widgetKey }))
+
+                    }
+
+                })
 
             }
         }

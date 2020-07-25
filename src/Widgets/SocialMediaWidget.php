@@ -17,7 +17,7 @@ class SocialMediaWidget extends Widget
         return 'social-media-widget';
     }
 
-    public function options(): array
+    public function fields(): array
     {
         return [
             Select::make('Type')

@@ -11,16 +11,16 @@
                       @resizeEnd="$emit('update', widget)"
                       :id="widget.id"
                       :min-width="1"
-                      :draggable="enableEdit"
-                      :resizable="enableEdit"
+                      :draggable="widget.editable"
+                      :resizable="widget.editable"
                       :resize-handle-size="0">
 
-                <component :is="widget.component"
+                <component :is="widget.schema.component"
                            :meta="widget"
                            :coordinates="widget.coordinates"
                            class="grid__content"/>
 
-                <div v-if="enableEdit"
+                <div v-if="widget.editable"
                      class="absolute pin-r pin-t m-2 z-20"
                      @click="$emit('edit', widget)">
 
@@ -40,25 +40,25 @@
 
                 </div>
 
-                <div class="absolute pin-r pin-b m-2 z-20" v-if="widget.options.help || widget.data.help">
+                <!--                <div class="absolute pin-r pin-b m-2 z-20" v-if="widget.options.help || widget.data.help">-->
 
-                    <tooltip trigger="hover">
+                <!--                    <tooltip trigger="hover">-->
 
-                        <icon type="help"
-                              viewBox="0 0 17 17"
-                              height="16"
-                              width="16"
-                              class="cursor-pointer text-60 -mb-1"/>
+                <!--                        <icon type="help"-->
+                <!--                              viewBox="0 0 17 17"-->
+                <!--                              height="16"-->
+                <!--                              width="16"-->
+                <!--                              class="cursor-pointer text-60 -mb-1"/>-->
 
-                        <tooltip-content slot="content"
-                                         v-html="widget.options.help || widget.data.help"
-                                         :max-width="200"/>
+                <!--                        <tooltip-content slot="content"-->
+                <!--                                         v-html="widget.options.help || widget.data.help"-->
+                <!--                                         :max-width="200"/>-->
 
-                    </tooltip>
+                <!--                    </tooltip>-->
 
-                </div>
+                <!--                </div>-->
 
-                <template v-if="enableEdit" v-slot:resizeBottomRight>
+                <template v-if="widget.editable" v-slot:resizeBottomRight>
                     <div class="grid__resize-handler"/>
                 </template>
 

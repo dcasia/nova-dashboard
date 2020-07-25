@@ -7,59 +7,74 @@
         <template v-else>
 
             <card class="flex p-4 justify-between nova-bi__menu"
-                  :class="{ 'rounded-b-none': openFilterView, 'p-8': openFilterView }">
+                  :class="{ 'rounded-b-none p-8': shouldExpandFilterView }">
 
                 <div class="flex flex-col justify-center px-2">
-                    <h1 class="flex text-90 font-normal text-2xl">{{ responseData.title }}</h1>
-                    <p class="mt-1 text-90 leading-tight" v-if="responseData.subtitle">
-                        {{ responseData.subtitle }}
+
+                    <p class="mt-1 text-60 leading-tight" v-if="responseData.title">
+                        {{ responseData.title }}
                     </p>
+
+                    <view-select @change="onViewSelected"
+                                 :selected-view="selectedViewKey"
+                                 :views="responseData.views"
+                                 class="mr-2"/>
+
                 </div>
 
                 <div class="flex items-center">
 
-                    <h1 class="flex text-60 cursor-pointer hover:text-90 font-normal text-xl mr-4">
-                        {{ responseData.title }}
-                    </h1>
+                    <FadeTransition>
 
-                    <button v-if="options.enableAddWidgetButton" role="button"
-                            class="rounded active:outline-none active:shadow-outline focus:outline-none focus:shadow-outline mr-2"
-                            @click="closeModal = false">
+                        <button v-if="allowWidgetEditing"
+                                role="button"
+                                class="rounded active:outline-none active:shadow-outline focus:outline-none focus:shadow-outline mr-2"
+                                @click="closeWidgetCreationModal = false">
 
-                        <div class="h-dropdown-trigger text-white font-bold flex items-center cursor-pointer select-none px-3 border-2 border-30 rounded bg-primary border-primary">
-                            {{ __('Add Widget') }}
-                        </div>
+                            <div class="h-dropdown-trigger text-white font-bold flex items-center cursor-pointer select-none px-3 border-2 border-30 rounded bg-primary border-primary">
+                                {{ __('Add Widget') }}
+                            </div>
 
-                    </button>
+                        </button>
 
-                    <dropdown v-if="responseData.filters.length > 0" @click.native="openFilterView = !openFilterView">
+                    </FadeTransition>
 
-                        <dropdown-trigger class="bg-30 px-3 border-2 border-30 rounded"
-                                          :class="{ 'bg-primary border-primary': openFilterView }"
-                                          :active="openFilterView">
+                    <FadeTransition>
 
-                            <icon type="filter" :class="openFilterView ? 'text-white' : 'text-80'"/>
+                        <dropdown v-if="filters.length > 0" @click.native="openFilterView = !openFilterView">
 
-                            <!--                        <span v-if="openFilterView" class="ml-2 font-bold text-white text-80">-->
-                            <!--                            {{ activeFilterCount }}-->
-                            <!--                        </span>-->
+                            <dropdown-trigger class="bg-30 px-3 border-2 border-30 rounded"
+                                              :class="{ 'bg-primary border-primary': shouldExpandFilterView }"
+                                              :active="shouldExpandFilterView">
 
-                        </dropdown-trigger>
+                                <icon type="filter" :class="shouldExpandFilterView ? 'text-white' : 'text-80'"/>
 
-                    </dropdown>
+                                <!--                        <span v-if="openFilterView" class="ml-2 font-bold text-white text-80">-->
+                                <!--                            {{ activeFilterCount }}-->
+                                <!--                        </span>-->
 
-                    <button v-if="responseData.actions.length > 0"
-                            role="button"
-                            class="rounded active:outline-none active:shadow-outline focus:outline-none focus:shadow-outline ml-2"
-                            @click="closeActionModal = false">
+                            </dropdown-trigger>
 
-                        <div class="h-dropdown-trigger text-white font-bold flex items-center cursor-pointer select-none px-3 border-2 border-30 rounded bg-primary border-primary">
+                        </dropdown>
 
-                            <icon type="play" class="text-white" style="margin-left: 7px;" />
+                    </FadeTransition>
 
-                        </div>
+                    <FadeTransition>
 
-                    </button>
+                        <button v-if="actions.length > 0"
+                                role="button"
+                                class="rounded active:outline-none active:shadow-outline focus:outline-none focus:shadow-outline ml-2"
+                                @click="closeActionModal = false">
+
+                            <div class="h-dropdown-trigger text-white font-bold flex items-center cursor-pointer select-none px-3 border-2 border-30 rounded bg-primary border-primary">
+
+                                <icon type="play" class="text-white" style="margin-left: 7px;"/>
+
+                            </div>
+
+                        </button>
+
+                    </FadeTransition>
 
                 </div>
 
@@ -67,13 +82,13 @@
 
             <CollapseTransition :duration="250">
 
-                <card v-if="openFilterView"
+                <card v-if="shouldExpandFilterView"
                       class="nova-bi__filter-container flex flex-wrap rounded-t-none border-t border-40 bg-30">
 
                     <component class="nova-bi__filter flex flex-col inline-flex w-1/2"
-                               v-for="filter in responseData.filters"
+                               v-for="filter in filters"
                                :key="filter.name"
-                               :resource-name="resourceName"
+                               :resource-name="dashboardKey"
                                :filter-key="filter.class"
                                :is="filter.component"
                                @input="filterChanged"
@@ -86,23 +101,32 @@
             <grid class="grid-stack flex-1 -mx-2 mt-8"
                   :options="options.grid"
                   :widgets="activeWidgets"
-                  :enable-edit="options.enableWidgetEditing && !this.responseData.usePreset"
-                  @update="saveWidget"
+                  :enable-edit="allowWidgetEditing"
+                  @update="updateCoordinates"
                   @edit="editOption"/>
 
             <portal to="modals" transition="fade-transition">
 
-                <create-widget-modal v-if="!closeModal"
-                                     :widgets="responseData.widgets"
-                                     :edit-widget="selectedWidget"
-                                     @delete="deleteWidget"
+                <create-widget-modal v-if="!closeWidgetCreationModal"
+                                     :schemas="schemas"
+                                     :dashboard-key="dashboardKey"
+                                     :view-key="activeView.uriKey"
+                                     @created="appendNewWidget"
                                      @close="resetModal"
-                                     @create="addWidget"
-                                     @update="updateWidget"/>
+                                     @create="addWidget"/>
+
+                <edit-widget-modal v-if="selectedWidgetForEditing"
+                                   :widget="selectedWidgetForEditing"
+                                   :dashboard-key="dashboardKey"
+                                   :view-key="activeView.uriKey"
+                                   @deleted="widgetWasDeleted"
+                                   @close="closeEditWidgetModal"
+                                   @updated="widgetWasUpdated"/>
 
                 <action-modal v-if="!closeActionModal"
-                              :dashboard="resourceName"
-                              :actions="responseData.actions"
+                              :dashboard-key="dashboardKey"
+                              :view-key="activeView.uriKey"
+                              :actions="actions"
                               @close="closeActionModal = true"/>
 
             </portal>
@@ -117,27 +141,41 @@
 
     import resource from '~~nova~~/store/resources'
     import CreateWidgetModal from './CreateWidgetModal'
+    import EditWidgetModal from './EditWidgetModal'
     import ActionModal from './ActionModal'
+    import ViewSelect from './ViewSelect'
     import { Minimum } from 'laravel-nova'
     import Grid from './Grid'
-    import { CollapseTransition } from 'vue2-transitions'
+    import { CollapseTransition, FadeTransition } from 'vue2-transitions'
 
     export default {
         name: 'Widget',
-        components: { CreateWidgetModal, Grid, CollapseTransition, ActionModal },
+        components: {
+            CreateWidgetModal,
+            EditWidgetModal,
+            Grid,
+            CollapseTransition,
+            FadeTransition,
+            ActionModal,
+            ViewSelect
+        },
         data() {
 
-            const resourceName = this.$route.params.resource
+            const dashboardKey = this.$route.params.resource
 
             return {
+                selectedViewKey: null,
+                selectedViewData: [],
                 loading: true,
-                resourceName,
+                dashboardKey,
+                cancelToken: null,
                 responseData: null,
                 openFilterView: true,
-                selectedWidget: null,
+                selectedWidgetForEditing: null,
                 activeWidgets: [],
-                closeModal: true,
-                closeActionModal: true
+                closeWidgetCreationModal: true,
+                closeActionModal: true,
+                closeWidgetEditModal: true
             }
 
         },
@@ -154,11 +192,9 @@
                 /**
                  * Initialize Vuex
                  */
-                this.$store.registerModule(this.resourceName, resource)
-                this.$store.commit(`${ this.resourceName }/storeFilters`, this.responseData.filters)
-
+                this.$store.registerModule(this.dashboardKey, resource)
                 this.loading = false
-                this.$nextTick(() => this.initialize())
+                this.initialize()
 
             } else if (response.status === 404) {
 
@@ -171,7 +207,77 @@
             }
 
         },
+        watch: {
+            selectedViewKey() {
+
+                this.$store.commit(`${ this.dashboardKey }/storeFilters`, this.filters)
+                this.activeWidgets = []
+
+                /**
+                 * Give some time for the transition to finish
+                 */
+                setTimeout(() => this.initialize(), 250)
+
+            }
+        },
         computed: {
+            allowWidgetEditing() {
+
+                return this.activeView.meta[ 'editable' ] ?? false
+
+            },
+            shouldExpandFilterView() {
+
+                if (this.filters.length === 0) {
+
+                    return false
+
+                }
+
+                return this.openFilterView
+
+            },
+            activeView() {
+
+                return this.responseData.views.find(view => view.uriKey === this.selectedViewKey)
+
+            },
+            actions() {
+
+                if (this.activeView) {
+
+                    return this.activeView.actions
+
+                }
+
+                return this.responseData.actions
+
+            },
+            filters() {
+
+                if (this.activeView) {
+
+                    return this.activeView.filters
+
+                }
+
+                return this.responseData.filters
+
+            },
+            views() {
+                return this.responseData.views
+            },
+            schemas() {
+
+                if (this.activeView) {
+
+                    return this.activeView.schemas
+
+                }
+
+                return {}
+
+            },
             options() {
                 return _.merge({
                     enableAddWidgetButton: true,
@@ -189,25 +295,54 @@
             }
         },
         methods: {
+            debouncer: _.debounce(callback => callback(), 100),
+            onViewSelected(viewKey) {
+
+                if (this.cancelToken) {
+
+                    this.cancelToken.cancel('Operation canceled by the user.')
+
+                }
+
+                const currentToken = this.cancelToken = axios.CancelToken.source()
+
+                Nova.request({
+                    method: 'get',
+                    url: '/nova-vendor/nova-widgets/widget/view',
+                    cancelToken: currentToken.token,
+                    params: {
+                        dashboard: this.dashboardKey,
+                        view: viewKey
+                    }
+                }).catch(error => {
+
+                    Nova.error(this.__('There was a problem fetching your view data.'))
+
+                }).then(response => {
+
+                    this.selectedViewData = response.data
+                    this.selectedViewKey = viewKey
+                    this.cancelToken = null
+
+                })
+
+            },
             initialize() {
 
                 this.openFilterView = this.options.expandFilterByDefault
 
-                for (const setting of this.responseData.data) {
+                if (!this.selectedViewKey && this.responseData.activeViewData) {
 
-                    const widget = this.findWidgetByKey(setting.widget.key)
-
-                    this.addWidget(widget, setting.options, setting.id, setting.coordinates)
+                    this.selectedViewKey = this.responseData.activeViewData.uriKey
+                    this.selectedViewData = this.responseData.activeViewData.data
 
                 }
 
-                // for (const preset of this.responseData.presets) {
-                //
-                //     const widget = this.findWidgetByKey(preset.widget.key)
-                //     // console.log(widget)
-                //     // this.addWidget(widget, preset.options, preset.coordinates)
-                //
-                // }
+                for (const state of this.selectedViewData) {
+
+                    this.appendWidget(state)
+
+                }
 
             },
             findWidgetByKey(key) {
@@ -217,10 +352,10 @@
             },
             editOption(widget) {
 
-                if (this.options.enableWidgetEditing) {
+                if (widget.editable) {
 
-                    this.selectedWidget = widget
-                    this.closeModal = false
+                    this.selectedWidgetForEditing = widget
+                    this.closeWidgetEditModal = false
 
                 }
 
@@ -228,101 +363,130 @@
             filterChanged() {
 
                 this.debouncer(() => {
-                    Nova.$emit('NovaFilterUpdate', this.$store.getters[ `${ this.resourceName }/currentEncodedFilters` ])
+                    Nova.$emit('NovaFilterUpdate', this.$store.getters[ `${ this.dashboardKey }/currentEncodedFilters` ])
                 })
 
             },
-            debouncer: _.debounce(callback => callback(), 100),
-            async saveWidget(widget) {
+            updateCoordinates(widget) {
+
+                Nova.request({
+                    method: 'post',
+                    url: '/nova-vendor/nova-widgets/widget/update-coordinates',
+                    data: {
+                        id: widget.id,
+                        dashboard: this.dashboardKey,
+                        view: widget.viewKey,
+                        widget: widget.widgetKey,
+                        coordinates: widget.coordinates
+                    }
+                }).catch(error => {
+
+                    Nova.error(this.__('There was a problem saving your latest changes.'))
+
+                }).then(response => {
+
+                    Nova.$emit(`widget-${ widget.id }-updated`, widget)
+
+                })
+
+            },
+            async widgetWasUpdated(updatedWidgetId, options) {
+
+                const activeWidget = this.activeWidgets.find(({ id }) => id === updatedWidgetId)
+
+                activeWidget.options = options
+
+                Nova.$emit(`widget-${ updatedWidgetId }-updated`, activeWidget)
+
+                this.closeEditWidgetModal()
+
+            },
+            closeEditWidgetModal() {
+
+                this.selectedWidgetForEditing = null
+
+            },
+            resetModal() {
+
+                this.closeWidgetCreationModal = true
+                this.selectedWidgetForEditing = null
+
+            },
+            async widgetWasDeleted(deletedId) {
+
+                this.closeEditWidgetModal()
+
+                const widgetIndex = this.activeWidgets.findIndex(({ id }) => id === deletedId)
+
+                this.activeWidgets.splice(widgetIndex, 1)
+
+                Nova.$emit(`widget-${ deletedId }-deleted`)
+
+            },
+            appendNewWidget(widgetData) {
+
+                this.activeWidgets.push(widgetData)
+
+            },
+            appendWidget({ data: { coordinates, id, options }, uriKey, editable }) {
+
+                const parsedOptions = {}
 
                 /**
-                 * If the widgets has been initialized in preset mode, do not attempt to persist the data to the database
+                 * Decode every nested json string into an object
                  */
-                if (this.responseData.usePreset) {
+                for (const key in options) {
 
-                    return
+                    try {
 
-                }
+                        parsedOptions[ key ] = JSON.parse(options[ key ])
 
-                const response = await Nova.request()
-                    .post(`/nova-vendor/nova-widgets/update/${ this.$route.params.resource }`, widget)
-                    .catch(error => error.response)
+                    } catch {
 
-                if (response.status === 200) {
-
-                    if (widget.id !== response.data) {
-
-                        const newWidgetId = response.data
-
-                        Nova.$emit(`widget-${ widget.id }-destroyed`, newWidgetId)
-
-                        widget.id = newWidgetId
+                        parsedOptions[ key ] = options[ key ]
 
                     }
 
                 }
 
-            },
-            async updateWidget(widget, options) {
-
-                const activeWidget = this.activeWidgets.find(({ id }) => id === widget.id)
-
-                activeWidget.options = options
-
-                await this.saveWidget(activeWidget)
-
-                Nova.$emit(`widget-${ activeWidget.id }-update`)
-
-                this.resetModal()
+                this.activeWidgets.push({
+                    id,
+                    editable,
+                    schema: this.schemas[ uriKey ],
+                    options: parsedOptions,
+                    coordinates: coordinates || { x: 0, y: 0, width: 2, height: 1 },
+                    dashboardKey: this.dashboardKey,
+                    viewKey: this.selectedViewKey,
+                    widgetKey: uriKey
+                })
 
             },
-            resetModal() {
+            async addWidget({ uriKey, component }, options) {
 
-                this.closeModal = true
-                this.selectedWidget = null
-
-            },
-            async deleteWidget(widget) {
-
-                const { id } = widget
-
-                const response = await Nova.request()
-                    .post(`/nova-vendor/nova-widgets/delete/${ this.$route.params.resource }`, { id })
-                    .catch(error => error.response)
-
-                if (response.status === 200 && response.data) {
-
-                    const widgetIndex = this.activeWidgets.findIndex(({ id }) => id === widget.id)
-
-                    this.activeWidgets.splice(widgetIndex, 1)
-
-                    Nova.$emit(`widget-${ widget.id }-deleted`)
-
-                    this.resetModal()
-
-                } else {
-
-                    // @todo
-                    alert('Failed to delete widget.')
-
-                }
-
-
-            },
-            async addWidget(widget, options, id, coordinates = { x: 0, y: 0, width: 2, height: 1 }) {
-
-                id = id ? id : Date.now() * Math.random()
-
-                const widgetData = { ...widget, id, options, coordinates }
+                // const widgetData = { ...widget, id, options, coordinates }
+                //
+                // this.$nextTick(() => this.resetModal())
+                //
+                // await this.updateCoordinates(widgetData)
+                //
+                // this.activeWidgets.push(widgetData)
 
                 this.$nextTick(() => this.resetModal())
 
-                await this.saveWidget(widgetData)
-
-                this.activeWidgets.push(widgetData)
+                this.activeWidgets.push({
+                    id: Date.now() * Math.random(),
+                    component: component,
+                    coordinates: { x: 0, y: 0, width: 2, height: 1 },
+                    widgetKey: uriKey,
+                    dashboardKey: this.dashboardKey,
+                    viewKey: this.selectedViewKey,
+                    options: options
+                })
 
             }
+
         }
+
     }
 
 </script>

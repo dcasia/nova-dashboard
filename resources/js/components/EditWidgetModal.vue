@@ -8,15 +8,8 @@
               style="width: 800px;">
 
             <div class="p-8 pb-0">
-                <heading :level="2" class="mb-6">{{ __('Create Widget') }}</heading>
+                <heading :level="2" class="mb-6">{{ __('Update Widget') }}</heading>
             </div>
-
-            <SelectInput id="widget-type"
-                         required
-                         :label="label"
-                         :options="options"
-                         :placeholder="placeholder"
-                         @input="onWidgetSelected"/>
 
             <div v-for="field in fields">
 
@@ -29,6 +22,14 @@
 
             <div class="bg-30 px-6 py-3 flex">
 
+                <button type="button"
+                        @click.prevent="handleDelete"
+                        class="btn btn-default btn-danger">
+
+                    {{ __('Delete') }}
+
+                </button>
+
                 <div class="ml-auto">
 
                     <button type="button"
@@ -39,13 +40,12 @@
 
                     </button>
 
-                    <progress-button @click.native="handleConfirm"
-                                     :disabled="!selectedSchema || working"
-                                     :processing="working">
+                    <button type="submit"
+                            class="btn btn-default btn-primary">
 
-                        {{ selectedSchema ? __('Create') : __('Select a widget type.') }}
+                        {{ __('Update') }}
 
-                    </progress-button>
+                    </button>
 
                 </div>
 
@@ -59,68 +59,96 @@
 
 <script>
 
-    import SelectInput from './SelectInput'
     import { Errors } from 'laravel-nova'
 
     export default {
-        name: 'CreateWidgetModal',
-        components: { SelectInput },
         props: {
             dashboardKey: { type: String, required: true },
             viewKey: { type: String, required: true },
-            schemas: { type: Object, required: true }
+            widget: { type: Object }
         },
         data() {
 
             return {
-                working: false,
-                errors: new Errors,
-                label: this.__('Type'),
-                placeholder: this.__('Choose an option'),
-                selectedSchemaKey: null,
-                options: _.keys(this.schemas).map(uriKey => {
-
-                    return {
-                        label: this.schemas[ uriKey ].title,
-                        value: uriKey
-                    }
-
-                })
+                errors: new Errors
             }
 
         },
         computed: {
-            selectedSchema() {
+            selectedWidget() {
 
-                return this.schemas[ this.selectedSchemaKey ]
+                return this.widgets.find(widget => widget.uriKey === this.selectedWidgetKey)
 
             },
             fields() {
 
-                if (this.selectedSchema) {
+                const options = this.widget.options || {}
+                const fields = this.widget.schema.fields || []
 
-                    return this.selectedSchema.fields || []
+                for (const attribute in options) {
+
+                    const option = fields.find(option => option.attribute === attribute)
+
+                    if (option) {
+
+                        try {
+
+                            option.value = JSON.parse(options[ attribute ])
+
+                        } catch {
+
+                            option.value = options[ attribute ]
+
+                        }
+
+                    }
 
                 }
 
-                return []
+                return fields
 
             }
         },
         methods: {
             handleDelete() {
 
-                this.$emit('delete', this.editWidget)
+                this.working = true
+
+                Nova.request({
+                    method: 'post',
+                    url: '/nova-vendor/nova-widgets/widget/delete',
+                    data: {
+                        id: this.widget.id,
+                        dashboard: this.dashboardKey,
+                        view: this.viewKey,
+                        widget: this.widget.widgetKey
+                    }
+                })
+                    .then(response => {
+
+                        if (response.data) {
+
+                            this.$emit('deleted', this.widget.id)
+
+                        } else {
+
+                            Nova.error(this.__('There was a problem deleting the widget.'))
+
+                        }
+
+                    })
+                    .catch(error => {
+
+                        this.working = false
+
+                        Nova.error(this.__('There was a problem deleting the widget.'))
+
+                    })
 
             },
             handleClose() {
 
                 this.$emit('close')
-
-            },
-            onWidgetSelected(value) {
-
-                this.selectedSchemaKey = value
 
             },
             handleConfirm() {
@@ -133,11 +161,12 @@
 
                 Nova.request({
                     method: 'post',
-                    url: '/nova-vendor/nova-widgets/widget/create',
+                    url: '/nova-vendor/nova-widgets/widget/update',
                     params: {
+                        id: this.widget.id,
                         dashboard: this.dashboardKey,
                         view: this.viewKey,
-                        widget: this.selectedSchemaKey
+                        widget: this.widget.widgetKey
                     },
                     data: formData
                 })
@@ -162,17 +191,8 @@
 
                         })
 
-                        this.$emit('created', {
-                            id: response.data,
-                            schema: this.selectedSchema,
-                            coordinates: { x: 0, y: 0, width: 2, height: 1 },
-                            widgetKey: this.selectedSchemaKey,
-                            dashboardKey: this.dashboardKey,
-                            viewKey: this.viewKey,
-                            options: options
-                        })
+                        this.$emit('updated', this.widget.id, options)
 
-                        this.handleClose()
                         this.working = false
 
                     })

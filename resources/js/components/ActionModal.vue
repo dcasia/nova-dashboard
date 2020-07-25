@@ -77,7 +77,8 @@
     export default {
         props: {
             actions: { type: Array, default: () => [] },
-            dashboard: { type: String, required: true }
+            dashboardKey: { type: String, required: true },
+            viewKey: { type: String, required: true }
         },
         data() {
 
@@ -158,24 +159,31 @@
 
                 Nova.request({
                     method: 'post',
-                    url: `/nova-vendor/nova-widgets/action/${ this.dashboard }/${ this.selectedAction.uriKey }`,
+                    url: '/nova-vendor/nova-widgets/execute/action',
+                    data: formData,
                     params: {
-                        filters: this.$store.getters[ `${ this.dashboard }/currentEncodedFilters` ]
-                    },
-                    data: formData
+                        dashboard: this.dashboardKey,
+                        action: this.selectedAction.uriKey,
+                        view: this.viewKey,
+                        filters: this.$store.getters[ `${ this.dashboardKey }/currentEncodedFilters` ]
+                    }
                 })
                     .then(response => {
+
                         this.handleActionResponse(response.data)
                         this.handleClose()
                         this.working = false
+
                     })
                     .catch(error => {
+
                         this.working = false
 
                         if (error.response.status === 422) {
                             this.errors = new Errors(error.response.data.errors)
                             Nova.error(this.__('There was a problem executing the action.'))
                         }
+
                     })
 
             },

@@ -15,9 +15,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('{resource}', [ WidgetController::class, 'resource' ]);
-Route::post('/update/{resource}', [ WidgetController::class, 'updateWidget' ]);
-Route::post('/delete/{resource}', [ WidgetController::class, 'deleteWidget' ]);
 Route::post('/card/{resource}', [ WidgetController::class, 'resolveCardResource' ]);
-Route::post('/action/{dashboard}/{action}', [ WidgetController::class, 'executeAction' ]);
-Route::post('{resource}/{id}', [ WidgetController::class, 'fetch' ]);
-Route::post('{resource}/{id}', [ WidgetController::class, 'fetch' ]);
+Route::post('/execute/action', [ WidgetController::class, 'executeAction' ]);
+Route::post('/fetch-widget-data', [ WidgetController::class, 'fetch' ]);
+Route::post('/widget/update', [ WidgetController::class, 'updateWidget' ]);
+Route::post('/widget/delete', [ WidgetController::class, 'deleteWidget' ]);
+Route::post('/widget/create', [ WidgetController::class, 'createWidget' ]);
+Route::post('/widget/update-coordinates', [ WidgetController::class, 'updateCoordinates' ]);
+Route::get('/widget/view', [ WidgetController::class, 'getViewData' ]);
