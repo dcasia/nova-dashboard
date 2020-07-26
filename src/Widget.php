@@ -25,7 +25,7 @@ abstract class Widget implements JsonSerializable
         $arguments = func_get_args();
         $argumentsCount = count($arguments);
 
-        if ($argumentsCount !== 0 && $argumentsCount <= 4) {
+        if ($argumentsCount !== 0 && $argumentsCount < 4) {
 
             throw new RuntimeException('Invalid number of arguments, expected: { int $x, int $y, int $width, int $height, ?array $options } or none.');
 

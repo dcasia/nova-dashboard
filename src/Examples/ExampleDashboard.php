@@ -1,11 +1,11 @@
 <?php
 
-namespace DigitalCreative\NovaDashboard\Example;
+namespace DigitalCreative\NovaDashboard\Examples;
 
 use App\Nova\Filters\TestFilter;
 use DigitalCreative\NovaDashboard\Dashboard;
-use DigitalCreative\NovaDashboard\Preset;
-use DigitalCreative\SocialMediaWidget\Widgets\SocialMediaWidget;
+use DigitalCreative\NovaDashboard\Examples\Views\AnotherView;
+use DigitalCreative\NovaDashboard\Examples\Views\ProductsSalesView;
 
 class ExampleDashboard extends Dashboard
 {
@@ -22,43 +22,17 @@ class ExampleDashboard extends Dashboard
         ];
     }
 
-    public function widgets(): array
+    public function views(): array
     {
         return [
-            SocialMediaWidget::make(1, 0, 1, 1),
-        ];
-    }
-
-    public function presets(): array
-    {
-        return [
-
-            Preset::make(SocialMediaWidget::class)
-                        ->coordinates(0, 0, 2, 1)
-                        ->options([
-                            'type' => SocialMediaWidget::TYPE_FACEBOOK
-                        ]),
-
-            Preset::make(SocialMediaWidget::class)
-                        ->coordinates(2, 0, 2, 1)
-                        ->options([
-                            'type' => SocialMediaWidget::TYPE_TWITTER
-                        ]),
-
-            Preset::make(SocialMediaWidget::class)
-                        ->coordinates(4, 0, 2, 1)
-                        ->options([
-                            'type' => SocialMediaWidget::TYPE_TWITTER
-                        ]),
-
+            new ProductsSalesView(),
+            AnotherView::make()->editable()
         ];
     }
 
     public function options(): array
     {
         return [
-            'enableAddWidgetButton' => true,
-            'enableWidgetEditing' => true,
             'expandFilterByDefault' => true,
             'grid' => [
                 'compact' => true,

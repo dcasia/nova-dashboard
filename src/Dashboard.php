@@ -4,6 +4,7 @@ namespace DigitalCreative\NovaDashboard;
 
 use Illuminate\Support\Collection;
 use JsonSerializable;
+use RuntimeException;
 
 abstract class Dashboard implements JsonSerializable
 {
@@ -57,10 +58,16 @@ abstract class Dashboard implements JsonSerializable
          */
         $view = $this->resolveViews()->first();
 
-        return [
-            'uriKey' => $view->uriKey(),
-            'data' => $view->resolveData(),
-        ];
+        if ($view) {
+
+            return [
+                'uriKey' => $view->uriKey(),
+                'data' => $view->resolveData(),
+            ];
+
+        }
+
+        throw new RuntimeException('No view defined. Create one by defining a views() method on your dashboard class.');
 
     }
 

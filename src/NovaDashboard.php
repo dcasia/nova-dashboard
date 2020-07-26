@@ -10,7 +10,7 @@ use Laravel\Nova\Tool;
 class NovaDashboard extends Tool
 {
 
-    private Collection $dashboards;
+    private array $dashboards;
     private bool $useNavigation = true;
 
     /**
@@ -21,9 +21,7 @@ class NovaDashboard extends Tool
     public function __construct(array $dashboards = [])
     {
 
-        $this->dashboards = collect($dashboards)->filter(function (Dashboard $dashboard) {
-            return $dashboard->authorizedToSee(request());
-        });
+        $this->dashboards = $dashboards;
 
         parent::__construct(null);
 
@@ -54,9 +52,11 @@ class NovaDashboard extends Tool
     public function renderNavigation(): ?View
     {
 
-        if ($this->dashboards->isNotEmpty() && $this->useNavigation) {
+        $dashboards = $this->resolveDashboards();
 
-            return view('nova-dashboard::navigation', [ 'dashboards' => $this->dashboards ]);
+        if ($dashboards->isNotEmpty() && $this->useNavigation) {
+
+            return view('nova-dashboard::navigation', [ 'dashboards' => $dashboards ]);
 
         }
 
@@ -64,15 +64,15 @@ class NovaDashboard extends Tool
 
     }
 
-    public function getCurrentActiveDashboard(string $resourceUri): ?Dashboard
+    public function getCurrentActiveDashboard(string $dashboardKey): ?Dashboard
     {
 
         /**
          * @var Dashboard $dashboard
          */
-        foreach ($this->dashboards as $dashboard) {
+        foreach ($this->resolveDashboards() as $dashboard) {
 
-            if ($dashboard::uriKey() === $resourceUri) {
+            if ($dashboard->uriKey() === $dashboardKey) {
 
                 return new $dashboard();
 
@@ -82,6 +82,19 @@ class NovaDashboard extends Tool
 
         return null;
 
+    }
+
+    private function resolveDashboards(): Collection
+    {
+        return once(function () {
+            return collect($this->dashboards)
+                ->map(static function ($dashboard) {
+                    return resolve($dashboard);
+                })
+                ->filter(static function (Dashboard $dashboard) {
+                    return $dashboard->authorizedToSee(request());
+                });
+        });
     }
 
 }

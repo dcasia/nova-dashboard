@@ -19,7 +19,6 @@
                             :id="selectInput.attribute"
                             v-model="key"
                             class="w-full form-control form-select"
-                            :class="errorClasses"
                             :options="selectInput.options"
                             @input.native="onActionSelected">
 
@@ -87,23 +86,10 @@
                 working: false,
                 errors: new Errors,
                 selectInput: {
-                    attribute: 'widget',
+                    attribute: 'action',
                     component: 'select-field',
-                    helpText: null,
-                    indexName: 'Widget',
-                    name: 'Widget',
-                    nullable: false,
-                    panel: null,
-                    prefixComponent: true,
-                    readonly: false,
+                    name: 'Action',
                     required: true,
-                    sortable: false,
-                    sortableUriKey: 'widget',
-                    stacked: false,
-                    textAlign: 'left',
-                    validationKey: 'widget',
-                    value: null,
-                    searchable: false,
                     options: this.actions.map(action => {
 
                         return {
