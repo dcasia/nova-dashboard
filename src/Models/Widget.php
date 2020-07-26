@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalCreative\NovaBi\Models;
+namespace DigitalCreative\NovaDashboard\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -9,10 +9,11 @@ use Illuminate\Support\Collection;
  * @property int id
  * @property string key
  * @property string dashboard
+ * @property string view
  * @property Collection options
  * @property Collection coordinates
  */
-class WidgetModel extends Model
+class Widget extends Model
 {
 
     /**
@@ -22,14 +23,15 @@ class WidgetModel extends Model
      */
     protected $casts = [
         'options' => 'collection',
-        'coordinates' => 'collection'
+        'coordinates' => 'collection',
+        'user_id' => 'int',
     ];
 
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
 
-        $this->setTable(config('nova-widgets.table_name'));
+        $this->setTable(config('nova-dashboard.table_name'));
     }
 
 }

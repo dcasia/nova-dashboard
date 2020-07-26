@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalCreative\NovaBi\Widgets;
+namespace DigitalCreative\NovaDashboard;
 
 use Illuminate\Support\Str;
 use Laravel\Nova\Makeable;

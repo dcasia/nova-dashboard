@@ -5,6 +5,7 @@
                   @selected="selectOption"
                   :value="selectedOption"
                   :data="filteredOptions"
+                  :debounce="100"
                   :clearable="false"
                   trackBy="value"
                   class="w-full view-select">
@@ -37,6 +38,7 @@
 <script>
 
     export default {
+        name: 'ViewSelect',
         props: {
             views: { type: Array, default: () => [] },
             selectedView: { type: String, default: null }

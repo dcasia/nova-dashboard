@@ -1,15 +1,16 @@
 <?php
 
-namespace DigitalCreative\NovaBi\Http\Controllers;
+namespace DigitalCreative\NovaDashboard\Http\Controllers;
 
-use DigitalCreative\NovaBi\Dashboards\Dashboard;
-use DigitalCreative\NovaBi\Filters;
-use DigitalCreative\NovaBi\Models\WidgetModel;
-use DigitalCreative\NovaBi\NovaWidgets;
-use DigitalCreative\NovaBi\Widgets\Action;
-use DigitalCreative\NovaBi\Widgets\View;
-use DigitalCreative\NovaBi\Widgets\Widget;
-use DigitalCreative\NovaBi\Widgets\WidgetCard;
+use DigitalCreative\NovaDashboard\Action;
+use DigitalCreative\NovaDashboard\Card;
+use DigitalCreative\NovaDashboard\Dashboard;
+use DigitalCreative\NovaDashboard\Filters;
+use DigitalCreative\NovaDashboard\Models\Widget as WidgetModel;
+use DigitalCreative\NovaDashboard\NovaDashboard;
+use DigitalCreative\NovaDashboard\ValueResult;
+use DigitalCreative\NovaDashboard\View;
+use DigitalCreative\NovaDashboard\Widget;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Fluent;
@@ -32,7 +33,6 @@ class WidgetController
 
         $viewKey = $this->findViewByKey($request, $dashboardKey, $viewKey);
         $action = $viewKey->findActionByKey($actionKey);
-
 
         $filters = new Filters($filters, $viewKey->resolveFilters());
         $fakeModel = new Fluent;
@@ -74,7 +74,7 @@ class WidgetController
 
         $view = $this->findViewByKey($request, $dashboardKey, $viewKey);
 
-        return response()->json($view->resolveDataFromDatabase());
+        return response()->json($view->resolveData());
 
     }
 
@@ -89,7 +89,7 @@ class WidgetController
         /**
          * Attempt to find the widget so authorization kicks in if user is unauthorized to interact with this resource
          */
-        $this->findWidget($request, $dashboardKey, $viewKey, $widgetKey);
+        $this->findWidgetKey($request, $dashboardKey, $viewKey, $widgetKey);
 
         /**
          * @var WidgetModel $widgetInstance
@@ -99,6 +99,8 @@ class WidgetController
         $widgetInstance->save();
 
         return response()->json($widgetInstance->id);
+
+
     }
 
     public function createWidget(NovaRequest $request): int
@@ -109,25 +111,31 @@ class WidgetController
         $widgetKey = $request->query('widget');
         $options = $request->post();
 
-        $widget = $this->findWidget($request, $dashboardKey, $viewKey, $widgetKey);
+        $widget = $this->findWidgetKey($request, $dashboardKey, $viewKey, $widgetKey);
 
         /**
          * $validate the request
          */
         $request->validate($widget->creationRules($request)->toArray());
 
-        return $this->storeWidget($dashboardKey, $viewKey, $widgetKey, $options)->id;
+        return $this->storeWidget($request, $dashboardKey, $viewKey, $widgetKey, $options)->id;
 
     }
 
-    private function findViewByKey(NovaRequest $request, string $dashboardKey, string $viewKey): View
+    private function findViewByKey(NovaRequest $request, string $dashboardKey, string $viewKey, bool $checkEditableStatus = false): View
     {
 
-        if ($dashboardInstance = $this->findDashboardByKey($request, $dashboardKey)) {
+        if ($dashboard = $this->findDashboardByKey($request, $dashboardKey)) {
 
-            if ($view = $dashboardInstance->findViewByKey($viewKey)) {
+            if ($view = $dashboard->findViewByKey($viewKey)) {
 
-                return $view;
+                if ($checkEditableStatus === false || $view->isEditable()) {
+
+                    return $view;
+
+                }
+
+                abort(403);
 
             }
 
@@ -139,10 +147,10 @@ class WidgetController
 
     }
 
-    private function findWidget(NovaRequest $request, string $dashboardKey, string $viewKey, string $widgetKey): Widget
+    private function findWidgetKey(NovaRequest $request, string $dashboardKey, string $viewKey, string $widgetKey): Widget
     {
 
-        $view = $this->findViewByKey($request, $dashboardKey, $viewKey);
+        $view = $this->findViewByKey($request, $dashboardKey, $viewKey, true);
 
         if ($widget = $view->findWidgetByKey($widgetKey)) {
 
@@ -154,20 +162,21 @@ class WidgetController
 
     }
 
-    private function storeWidget(string $dashboardKey, string $viewKey, string $widgetKey, array $options): WidgetModel
+    private function storeWidget(NovaRequest $request, string $dashboardKey, string $viewKey, string $widgetKey, array $options): WidgetModel
     {
 
         /**
          * @var Builder $query
          * @var WidgetModel $widgetInstance
          */
-        $modelClass = config('nova-widgets.widget_model');
+        $modelClass = config('nova-dashboard.widget_model');
         $widgetInstance = resolve($modelClass);
 
         $widgetInstance->setAttribute('key', $widgetKey);
         $widgetInstance->setAttribute('dashboard', $dashboardKey);
         $widgetInstance->setAttribute('view', $viewKey);
         $widgetInstance->setAttribute('options', $options);
+        $widgetInstance->setAttribute('user_id', $request->user()->id);
         $widgetInstance->save();
 
         return $widgetInstance;
@@ -185,7 +194,7 @@ class WidgetController
         /**
          * Attempt to find the widget so authorization kicks in if user is unauthorized to interact with this resource
          */
-        $this->findWidget($request, $dashboardKey, $viewKey, $widgetKey);
+        $this->findWidgetKey($request, $dashboardKey, $viewKey, $widgetKey);
 
         return response()->json(
             (bool) $this->widgetModel()->newQuery()->whereKey($id)->delete()
@@ -204,7 +213,7 @@ class WidgetController
         /**
          * Attempt to find the widget so authorization kicks in if user is unauthorized to interact with this resource
          */
-        $this->findWidget($request, $dashboardKey, $viewKey, $widgetKey);
+        $this->findWidgetKey($request, $dashboardKey, $viewKey, $widgetKey);
 
         /**
          * @var WidgetModel $widgetInstance
@@ -217,10 +226,10 @@ class WidgetController
 
     }
 
-    public function resolveCardResource(NovaRequest $request)
+    public function resolveCardResource(NovaRequest $request): ValueResult
     {
         /**
-         * @var WidgetCard $first
+         * @var Card $first
          */
         $first = $request->newResource()->cards($request)[ 0 ];
 
@@ -228,16 +237,16 @@ class WidgetController
 
     }
 
-    public function resource(string $resource, NovaRequest $request)
+    public function getDashboard(string $dashboardKey, NovaRequest $request)
     {
 
-        if ($dashboard = $this->findDashboardByKey($request, $resource)) {
+        if ($dashboard = $this->findDashboardByKey($request, $dashboardKey)) {
 
-            return $dashboard->jsonSerialize();
+            return response()->json($dashboard);
 
         }
 
-        return abort(404, "Dashboard $resource not found.");
+        return abort(404, __('Dashboard :dashboard not found.', [ 'dashboard' => $dashboardKey ]));
 
     }
 
@@ -248,7 +257,7 @@ class WidgetController
      *
      * @return JsonResponse
      */
-    public function fetch(NovaRequest $request): JsonResponse
+    public function fetchWidgetData(NovaRequest $request): JsonResponse
     {
 
         $filters = $request->input('filters');
@@ -285,12 +294,12 @@ class WidgetController
 
     }
 
-    public function findTool(NovaRequest $request): ?NovaWidgets
+    public function findTool(NovaRequest $request): ?NovaDashboard
     {
 
         foreach (Nova::availableTools($request) as $tool) {
 
-            if ($tool instanceof NovaWidgets) {
+            if ($tool instanceof NovaDashboard) {
 
                 return $tool;
 
@@ -304,7 +313,7 @@ class WidgetController
 
     private function widgetModel(): WidgetModel
     {
-        return resolve(config('nova-widgets.widget_model'));
+        return resolve(config('nova-dashboard.widget_model'));
     }
 
 }

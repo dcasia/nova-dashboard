@@ -1,74 +1,49 @@
 <?php
 
-namespace DigitalCreative\NovaBi\Widgets;
+namespace DigitalCreative\NovaDashboard;
 
-use DigitalCreative\NovaBi\Filters;
-use DigitalCreative\NovaBi\Models\WidgetModel;
+use DigitalCreative\NovaDashboard\Models\Widget as WidgetModel;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use JsonSerializable;
-use Laravel\Nova\AuthorizedToSee;
 use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Http\Requests\NovaRequest;
-use Laravel\Nova\Makeable;
-use Laravel\Nova\Metable;
-use Laravel\Nova\ProxiesCanSeeToGate;
 use RuntimeException;
 
 abstract class Widget implements JsonSerializable
 {
 
-    use Makeable;
-    use Metable;
-    use ProxiesCanSeeToGate;
-    use AuthorizedToSee;
-    use TitleableTrait;
+    use DashboardTrait;
 
-    private static int $counter = 0;
-
-    public string $key;
     public ?Preset $preset = null;
 
     public function __construct()
     {
 
-        $this->key = static::key();
-
         /**
-         * If 5 arguments was given assume this is to be set in preset mode
+         * If 4 or 5 arguments was given assume this is to be set in preset mode
          */
         $arguments = func_get_args();
         $argumentsCount = count($arguments);
 
-        if ($argumentsCount !== 0 && $argumentsCount !== 5) {
+        if ($argumentsCount !== 0 && $argumentsCount <= 4) {
 
-            throw new RuntimeException('Invalid number of arguments, expected: { int $x, int $y, int $width, int $height, array $options } or none.');
+            throw new RuntimeException('Invalid number of arguments, expected: { int $x, int $y, int $width, int $height, ?array $options } or none.');
 
         }
 
-        if (count($arguments) === 5) {
+        if (count($arguments) >= 4) {
 
             $this->preset = Preset::make($this)
                                   ->coordinates($arguments[ 0 ], $arguments[ 1 ], $arguments[ 2 ], $arguments[ 3 ])
-                                  ->options($arguments[ 4 ]);
+                                  ->options($arguments[ 4 ] ?? []);
 
         }
 
     }
 
-    abstract public function resolveValue(Collection $options, Filters $filters): Value;
+    abstract public function resolveValue(Collection $options, Filters $filters): ValueResult;
 
     abstract public function component(): string;
-
-    public function name(): string
-    {
-        return Str::title(Str::snake(class_basename(static::class), ' '));
-    }
-
-    public static function key(): string
-    {
-        return Str::kebab(class_basename(static::class));
-    }
 
     public function fields(): array
     {
@@ -88,7 +63,7 @@ abstract class Widget implements JsonSerializable
         /**
          * @var Field $option
          */
-        foreach ($this->fields() as $option) {
+        foreach ($this->resolveFields() as $option) {
 
             $options[ $option->attribute ] = $option->value ?? $option->jsonSerialize()[ 'value' ] ?? null;
 
@@ -98,15 +73,12 @@ abstract class Widget implements JsonSerializable
 
     }
 
-    public static function preset(int $x, int $y, int $width, int $height): Preset
-    {
-        return Preset::make(new static)->coordinates($x, $y, $width, $height);
-    }
-
     public function resolveFields(): Collection
     {
-        return collect($this->fields())->filter(function (Field $action) {
-            return $action->authorizedToSee(request());
+        return once(function () {
+            return collect($this->fields())->filter(function (Field $action) {
+                return $action->authorizedToSee(request());
+            });
         });
     }
 
@@ -149,16 +121,21 @@ abstract class Widget implements JsonSerializable
         ]);
     }
 
+    public function getSchema(): array
+    {
+        return [
+            'component' => $this->component(),
+            'title' => $this->title(),
+            'fields' => $this->resolveFields(),
+        ];
+    }
+
     public function jsonSerialize(): array
     {
         return [
-            'uriKey' => static::uriKey(),
+            'uriKey' => $this->uriKey(),
             'editable' => blank($this->preset),
-            //            'title' => $this->title(),
-            //            'component' => $this->component(),
             'data' => $this->meta(),
-            //            'preset' => $this->preset,
-            //            'fields' => $this->resolveFields(),
         ];
     }
 

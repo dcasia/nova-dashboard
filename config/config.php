@@ -2,11 +2,11 @@
 
 declare(strict_types = 1);
 
-use DigitalCreative\NovaBi\Models\WidgetModel;
+use DigitalCreative\NovaDashboard\Models\Widget;
 
 return [
 
-    'widget_model' => WidgetModel::class,
-    'table_name' => 'nova_widgets',
+    'widget_model' => Widget::class,
+    'table_name' => 'widgets',
 
 ];

@@ -159,7 +159,7 @@
 
                 Nova.request({
                     method: 'post',
-                    url: '/nova-vendor/nova-widgets/execute/action',
+                    url: '/nova-vendor/nova-dashboard/execute/action',
                     data: formData,
                     params: {
                         dashboard: this.dashboardKey,

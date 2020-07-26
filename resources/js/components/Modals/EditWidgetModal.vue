@@ -116,7 +116,7 @@
 
                 Nova.request({
                     method: 'post',
-                    url: '/nova-vendor/nova-widgets/widget/delete',
+                    url: '/nova-vendor/nova-dashboard/widget/delete',
                     data: {
                         id: this.widget.id,
                         dashboard: this.dashboardKey,
@@ -161,7 +161,7 @@
 
                 Nova.request({
                     method: 'post',
-                    url: '/nova-vendor/nova-widgets/widget/update',
+                    url: '/nova-vendor/nova-dashboard/widget/update',
                     params: {
                         id: this.widget.id,
                         dashboard: this.dashboardKey,

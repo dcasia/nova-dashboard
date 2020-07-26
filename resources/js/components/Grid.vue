@@ -1,18 +1,18 @@
 <template>
 
-    <Dashboard class="grid" id="nova-widgets">
+    <Dashboard class="grid" id="nova-dashboard">
 
         <DashLayout v-bind="options">
 
             <DashItem class="grid__item"
                       v-for="widget of widgets" :key="widget.id"
                       v-bind.sync="widget.coordinates"
-                      @moveEnd="$emit('update', widget)"
-                      @resizeEnd="$emit('update', widget)"
+                      @moveEnd="$emit('moved', widget)"
+                      @resizeEnd="$emit('moved', widget)"
                       :id="widget.id"
                       :min-width="1"
-                      :draggable="widget.editable"
-                      :resizable="widget.editable"
+                      :draggable="widget.editable && allowEdit"
+                      :resizable="widget.editable && allowEdit"
                       :resize-handle-size="0">
 
                 <component :is="widget.schema.component"
@@ -20,7 +20,7 @@
                            :coordinates="widget.coordinates"
                            class="grid__content"/>
 
-                <div v-if="widget.editable"
+                <div v-if="widget.editable && allowEdit"
                      class="absolute pin-r pin-t m-2 z-20"
                      @click="$emit('edit', widget)">
 
@@ -40,25 +40,25 @@
 
                 </div>
 
-                <!--                <div class="absolute pin-r pin-b m-2 z-20" v-if="widget.options.help || widget.data.help">-->
+                <div class="absolute pin-r pin-b m-2 z-20" v-if="widget.meta.help || widget.options.help">
 
-                <!--                    <tooltip trigger="hover">-->
+                    <tooltip trigger="hover">
 
-                <!--                        <icon type="help"-->
-                <!--                              viewBox="0 0 17 17"-->
-                <!--                              height="16"-->
-                <!--                              width="16"-->
-                <!--                              class="cursor-pointer text-60 -mb-1"/>-->
+                        <icon type="help"
+                              viewBox="0 0 17 17"
+                              height="16"
+                              width="16"
+                              class="cursor-pointer text-60 -mb-1"/>
 
-                <!--                        <tooltip-content slot="content"-->
-                <!--                                         v-html="widget.options.help || widget.data.help"-->
-                <!--                                         :max-width="200"/>-->
+                        <tooltip-content slot="content"
+                                         v-html="widget.meta.help || widget.options.help"
+                                         :max-width="200"/>
 
-                <!--                    </tooltip>-->
+                    </tooltip>
 
-                <!--                </div>-->
+                </div>
 
-                <template v-if="widget.editable" v-slot:resizeBottomRight>
+                <template v-if="widget.editable && allowEdit" v-slot:resizeBottomRight>
                     <div class="grid__resize-handler"/>
                 </template>
 
@@ -76,7 +76,7 @@
 
     export default {
         name: 'Grid',
-        props: [ 'widgets', 'options', 'enableEdit' ],
+        props: [ 'widgets', 'options', 'allowEdit' ],
         components: {
             Dashboard,
             DashLayout,

@@ -1,9 +1,12 @@
 {
-    "name": "digital-creative/nova-bi",
-    "description": "A Laravel Nova tool.",
+    "name": "digital-creative/nova-dashboard",
+    "description": "The missing dashboard for nova.",
     "keywords": [
         "laravel",
-        "nova"
+        "nova",
+        "dashboard",
+        "widgets",
+        "flexible"
     ],
     "license": "MIT",
     "require": {
@@ -11,13 +14,13 @@
     },
     "autoload": {
         "psr-4": {
-            "DigitalCreative\\NovaBi\\": "src/"
+            "DigitalCreative\\NovaDashboard\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "DigitalCreative\\NovaBi\\ToolServiceProvider"
+                "DigitalCreative\\NovaDashboard\\ToolServiceProvider"
             ]
         }
     },

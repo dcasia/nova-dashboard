@@ -1,6 +1,6 @@
 <?php
 
-use DigitalCreative\NovaBi\Http\Controllers\WidgetController;
+use DigitalCreative\NovaDashboard\Http\Controllers\WidgetController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,10 +14,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('{resource}', [ WidgetController::class, 'resource' ]);
+Route::get('{dashboardKey}', [ WidgetController::class, 'getDashboard' ]);
 Route::post('/card/{resource}', [ WidgetController::class, 'resolveCardResource' ]);
 Route::post('/execute/action', [ WidgetController::class, 'executeAction' ]);
-Route::post('/fetch-widget-data', [ WidgetController::class, 'fetch' ]);
+Route::post('/fetch-widget-data', [ WidgetController::class, 'fetchWidgetData' ]);
 Route::post('/widget/update', [ WidgetController::class, 'updateWidget' ]);
 Route::post('/widget/delete', [ WidgetController::class, 'deleteWidget' ]);
 Route::post('/widget/create', [ WidgetController::class, 'createWidget' ]);

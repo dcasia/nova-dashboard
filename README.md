@@ -1,7 +1,7 @@
 Add this to NovaServiceProvider.php
 
 ```
-new NovaBi([
+new NovaDashboard([
     ExampleDashboard::class
 ])
 ```

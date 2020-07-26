@@ -1,22 +1,27 @@
 <?php
 
-namespace DigitalCreative\NovaBi\Http\Middleware;
+namespace DigitalCreative\NovaDashboard\Http\Middleware;
 
+use Closure;
+use DigitalCreative\NovaDashboard\NovaDashboard;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Laravel\Nova\Nova;
-use DigitalCreative\NovaBi\NovaWidgets;
+use Laravel\Nova\Tool;
 
 class Authorize
 {
     /**
      * Handle the incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param Closure $next
+     *
+     * @return Response
      */
     public function handle($request, $next)
     {
-        $tool = collect(Nova::registeredTools())->first([$this, 'matchesTool']);
+        $tool = collect(Nova::registeredTools())->first([ $this, 'matchesTool' ]);
 
         return optional($tool)->authorize($request) ? $next($request) : abort(403);
     }
@@ -24,11 +29,12 @@ class Authorize
     /**
      * Determine whether this tool belongs to the package.
      *
-     * @param  \Laravel\Nova\Tool  $tool
+     * @param Tool $tool
+     *
      * @return bool
      */
     public function matchesTool($tool)
     {
-        return $tool instanceof NovaWidgets;
+        return $tool instanceof NovaDashboard;
     }
 }

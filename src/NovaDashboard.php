@@ -1,14 +1,13 @@
 <?php
 
-namespace DigitalCreative\NovaBi;
+namespace DigitalCreative\NovaDashboard;
 
-use DigitalCreative\NovaBi\Dashboards\Dashboard;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Tool;
 
-class NovaWidgets extends Tool
+class NovaDashboard extends Tool
 {
 
     private Collection $dashboards;
@@ -44,7 +43,7 @@ class NovaWidgets extends Tool
      */
     public function boot()
     {
-        Nova::script('nova-widgets', __DIR__ . '/../dist/js/tool.js');
+        Nova::script('nova-dashboard', __DIR__ . '/../dist/js/tool.js');
     }
 
     /**
@@ -57,7 +56,7 @@ class NovaWidgets extends Tool
 
         if ($this->dashboards->isNotEmpty() && $this->useNavigation) {
 
-            return view('nova-widgets::navigation', [ 'dashboards' => $this->dashboards ]);
+            return view('nova-dashboard::navigation', [ 'dashboards' => $this->dashboards ]);
 
         }
 

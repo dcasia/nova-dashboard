@@ -11,6 +11,7 @@ class CreateNovaWidgetsTable extends Migration
     {
         Schema::create(config('nova-widgets.table_name'), static function (Blueprint $table) {
             $table->id();
+            $table->unsignedInteger('user_id');
             $table->string('dashboard');
             $table->string('view');
             $table->string('key');

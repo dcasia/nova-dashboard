@@ -1,27 +1,21 @@
 <?php
 
-namespace DigitalCreative\NovaBi\Widgets;
+namespace DigitalCreative\NovaDashboard;
 
-use DigitalCreative\NovaBi\Filters;
-use DigitalCreative\NovaBi\Models\WidgetModel;
+use DigitalCreative\NovaDashboard\Models\Widget as WidgetModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use JsonSerializable;
-use Laravel\Nova\AuthorizedToSee;
 use Laravel\Nova\Contracts\Filter as FilterContract;
-use Laravel\Nova\Makeable;
-use Laravel\Nova\Metable;
-use Laravel\Nova\ProxiesCanSeeToGate;
+use Laravel\Nova\Http\Requests\NovaRequest;
 
 class View implements JsonSerializable
 {
-    use Makeable;
-    use Metable;
-    use ProxiesCanSeeToGate;
-    use AuthorizedToSee;
-    use TitleableTrait;
+
+    use DashboardTrait;
 
     private string $dashboardKey;
+    private bool $private = false;
 
     public function setDashboard(string $dashboardKey): self
     {
@@ -45,7 +39,7 @@ class View implements JsonSerializable
         return [];
     }
 
-    public function resolveWidgetValue(string $widgetKey, Collection $options, Filters $filters): Value
+    public function resolveWidgetValue(string $widgetKey, Collection $options, Filters $filters): ValueResult
     {
 
         if ($widget = $this->findWidgetByKey($widgetKey)) {
@@ -61,7 +55,7 @@ class View implements JsonSerializable
     public function findWidgetByKey(string $key): ?Widget
     {
         return $this->resolveWidgets()->first(function (Widget $widget) use ($key) {
-            return $widget::uriKey() === $key;
+            return $widget->uriKey() === $key;
         });
     }
 
@@ -72,9 +66,33 @@ class View implements JsonSerializable
         });
     }
 
-    public function editable(bool $allowEdit = true): self
+    /**
+     * When set to true only who created the widgets are able to see it
+     *
+     * @param bool $isPrivate
+     *
+     * @return $this
+     */
+    public function private(bool $isPrivate = true): self
     {
-        return $this->withMeta([ 'editable' => $allowEdit ]);
+        $this->private = $isPrivate;
+
+        return $this;
+    }
+
+    /**
+     * @param bool|callable $editable
+     *
+     * @return $this
+     */
+    public function editable($editable = true): self
+    {
+        return $this->withMeta([ 'editable' => $editable ]);
+    }
+
+    public function isEditable(): bool
+    {
+        return $this->meta('editable');
     }
 
     public function resolveFilters(): Collection
@@ -118,7 +136,7 @@ class View implements JsonSerializable
                     });
     }
 
-    public function resolveData()
+    public function resolveData(): Collection
     {
 
         $widgets = $this->resolveWidgets();
@@ -131,24 +149,28 @@ class View implements JsonSerializable
             return $widget->preset;
         });
 
-
         $fromPreset = $withPresets->map(function (Widget $widget) {
             return $widget->hydrateFromPreset($widget->preset);
         });
 
-        $keys = $withoutPresets->map(function (Widget $widget) {
-            return $widget->key;
-        })->unique();
+        $keys = $withoutPresets
+            ->map(function (Widget $widget) {
+                return $widget->uriKey();
+            })
+            ->unique();
 
         /**
          * @var Builder $query
          */
-        $modelClass = config('nova-widgets.widget_model');
+        $modelClass = config('nova-dashboard.widget_model');
         $query = $modelClass::query();
 
         $fromDatabase = $query->where('dashboard', $this->dashboardKey)
-                              ->where('view', self::uriKey())
+                              ->where('view', $this->uriKey())
                               ->whereIn('key', $keys)
+                              ->when($this->private, function (Builder $builder) {
+                                  $builder->where('user_id', resolve(NovaRequest::class)->user()->id);
+                              })
                               ->get()
                               ->map(function (WidgetModel $model) {
 
@@ -165,18 +187,6 @@ class View implements JsonSerializable
 
         return $fromDatabase->concat($fromPreset);
 
-        return $this->resolveWidgets()
-                    ->map(function (Widget $widget) {
-
-                        if ($preset = $widget->preset) {
-
-                            return $widget->hydrateFromPreset($preset);
-
-                        }
-
-                        return $widget->hydrate();
-
-                    });
     }
 
     public function resolveDataFromDatabase(): Collection
@@ -185,11 +195,11 @@ class View implements JsonSerializable
         /**
          * @var Builder $query
          */
-        $modelClass = config('nova-widgets.widget_model');
+        $modelClass = config('nova-dashboard.widget_model');
         $query = $modelClass::query();
 
         return $query->where('dashboard', $this->dashboardKey)
-                     ->where('view', self::uriKey())
+                     ->where('view', $this->uriKey())
                      ->get()
                      ->map(function (WidgetModel $model) {
 
@@ -211,25 +221,16 @@ class View implements JsonSerializable
         return $this->resolveWidgets()
                     ->mapWithKeys(function (Widget $widget) {
                         return [
-                            $widget::uriKey() => [
-                                'component' => $widget->component(),
-                                'title' => $widget->title(),
-                                'fields' => $widget->resolveFields(),
-                            ],
+                            $widget->uriKey() => $widget->getSchema(),
                         ];
                     });
-    }
-
-    public function isEditable(): bool
-    {
-        return $this->meta[ 'editable' ] ?? false;
     }
 
     public function jsonSerialize(): array
     {
         return [
             'title' => $this->title(),
-            'uriKey' => static::uriKey(),
+            'uriKey' => $this->uriKey(),
             'filters' => $this->resolveFilters(),
             'actions' => $this->resolveActions(),
             'schemas' => $this->resolveSchemas(),

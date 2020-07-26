@@ -24,6 +24,7 @@
 <script>
 
     export default {
+        name: 'SelectInput',
         props: {
             label: { type: String, required: true },
             id: { type: String, required: true },

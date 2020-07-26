@@ -32,7 +32,7 @@
         },
         async created() {
 
-            const callback = widget => this.fetchData(widget)
+            const callback = encodedFilters => this.fetchData(encodedFilters)
 
             Nova.$on('NovaFilterUpdate', callback)
             Nova.$on(`widget-${ this.meta.id }-updated`, callback)
@@ -45,26 +45,26 @@
         },
         async mounted() {
 
-            await this.fetchData(this.meta)
+            await this.fetchData()
 
         },
         methods: {
-            async fetchData(widget) {
+            async fetchData() {
 
                 this.loading = true
 
-                const filters = this.$store.getters[ `${ widget.dashboardKey }/currentEncodedFilters` ]
+                const encodedFilters = this.$store.getters[ `${ this.meta.dashboardKey }/currentEncodedFilters` ]
 
                 await Minimum(
                     Nova.request({
                         method: 'post',
-                        url: '/nova-vendor/nova-widgets/fetch-widget-data',
+                        url: '/nova-vendor/nova-dashboard/fetch-widget-data',
                         data: {
-                            dashboard: widget.dashboardKey,
-                            view: widget.viewKey,
-                            widget: widget.widgetKey,
-                            filters: filters,
-                            options: widget.options
+                            dashboard: this.meta.dashboardKey,
+                            view: this.meta.viewKey,
+                            widget: this.meta.widgetKey,
+                            filters: encodedFilters,
+                            options: this.meta.options
                         }
                     }), 300
                 ).then(response => {
@@ -88,7 +88,9 @@
                 })
 
             }
+
         }
+
     }
 
 </script>

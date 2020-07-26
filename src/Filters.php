@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalCreative\NovaBi;
+namespace DigitalCreative\NovaDashboard;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;

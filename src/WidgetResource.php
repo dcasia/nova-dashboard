@@ -1,9 +1,8 @@
 <?php
 
-namespace DigitalCreative\NovaBi\Widgets;
+namespace DigitalCreative\NovaDashboard;
 
 use DigitalCreative\CollapsibleResourceManager\Resources\AbstractResource;
-use DigitalCreative\NovaBi\Dashboards\Dashboard;
 
 class WidgetResource extends AbstractResource
 {
@@ -21,6 +20,8 @@ class WidgetResource extends AbstractResource
     public function __construct(string $resource)
     {
         $this->resource = $resource;
+
+        parent::__construct([]);
     }
 
     /**
@@ -34,9 +35,9 @@ class WidgetResource extends AbstractResource
             'icon' => $this->getIcon(),
             'label' => $this->getLabel(),
             'router' => [
-                'name' => 'nova-widgets',
+                'name' => 'nova-dashboard',
                 'params' => [
-                    'resource' => $this->resource::uriKey(),
+                    'dashboardKey' => $this->resource::uriKey(),
                 ],
             ],
         ];

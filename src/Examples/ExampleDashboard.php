@@ -1,10 +1,10 @@
 <?php
 
-namespace DigitalCreative\NovaBi\Dashboards\Example;
+namespace DigitalCreative\NovaDashboard\Example;
 
 use App\Nova\Filters\TestFilter;
-use DigitalCreative\NovaBi\Dashboards\Dashboard;
-use DigitalCreative\NovaBi\Widgets\Preset;
+use DigitalCreative\NovaDashboard\Dashboard;
+use DigitalCreative\NovaDashboard\Preset;
 use DigitalCreative\SocialMediaWidget\Widgets\SocialMediaWidget;
 
 class ExampleDashboard extends Dashboard

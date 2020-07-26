@@ -1,17 +1,17 @@
 <?php
 
-namespace DigitalCreative\NovaBi\Widgets;
+namespace DigitalCreative\NovaDashboard;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Laravel\Nova\Makeable;
 
 /**
- * Class Value
+ * Class ValueResult
  *
- * @package DigitalCreative\NovaBi\Widgets
+ * @package DigitalCreative\NovaDashboard\Widgets
  */
-class Value extends Fluent
+class ValueResult extends Fluent
 {
 
     use Makeable;
@@ -21,10 +21,12 @@ class Value extends Fluent
      */
     protected Collection $options;
 
-    public function __construct($options)
+    public function __construct($options = null)
     {
         $this->options = collect($options); // temp @todo
+
         parent::__construct([]);
+
     }
 
 }

@@ -1,12 +1,10 @@
 <?php
 
-namespace DigitalCreative\NovaBi;
+namespace DigitalCreative\NovaDashboard;
 
-use DigitalCreative\NovaBi\Http\Middleware\Authorize;
+use DigitalCreative\NovaDashboard\Http\Middleware\Authorize;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Laravel\Nova\Events\ServingNova;
-use Laravel\Nova\Nova;
 
 class ToolServiceProvider extends ServiceProvider
 {
@@ -18,7 +16,7 @@ class ToolServiceProvider extends ServiceProvider
     public function boot(): void
     {
 
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'nova-widgets');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'nova-dashboard');
 
         /**
          * Migrations
@@ -29,14 +27,10 @@ class ToolServiceProvider extends ServiceProvider
         /**
          * Config
          */
-        $this->publishes([ __DIR__ . '/../config/config.php' => config_path('nova-widgets.php') ], 'config');
+        $this->publishes([ __DIR__ . '/../config/config.php' => config_path('nova-dashboard.php') ], 'config');
 
         $this->app->booted(function () {
             $this->routes();
-        });
-
-        Nova::serving(function (ServingNova $event) {
-
         });
 
     }
@@ -53,7 +47,7 @@ class ToolServiceProvider extends ServiceProvider
         }
 
         Route::middleware([ 'nova', Authorize::class ])
-             ->prefix('nova-vendor/nova-widgets')
+             ->prefix('nova-vendor/nova-dashboard')
              ->group(__DIR__ . '/../routes/api.php');
     }
 
@@ -64,6 +58,6 @@ class ToolServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(dirname(__DIR__) . '/config/config.php', 'nova-widgets');
+        $this->mergeConfigFrom(dirname(__DIR__) . '/config/config.php', 'nova-dashboard');
     }
 }

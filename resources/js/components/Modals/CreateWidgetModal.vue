@@ -59,7 +59,7 @@
 
 <script>
 
-    import SelectInput from './SelectInput'
+    import SelectInput from '../Inputs/SelectInput'
     import { Errors } from 'laravel-nova'
 
     export default {
@@ -108,11 +108,6 @@
             }
         },
         methods: {
-            handleDelete() {
-
-                this.$emit('delete', this.editWidget)
-
-            },
             handleClose() {
 
                 this.$emit('close')
@@ -133,7 +128,7 @@
 
                 Nova.request({
                     method: 'post',
-                    url: '/nova-vendor/nova-widgets/widget/create',
+                    url: '/nova-vendor/nova-dashboard/widget/create',
                     params: {
                         dashboard: this.dashboardKey,
                         view: this.viewKey,
@@ -169,7 +164,9 @@
                             widgetKey: this.selectedSchemaKey,
                             dashboardKey: this.dashboardKey,
                             viewKey: this.viewKey,
-                            options: options
+                            options: options,
+                            editable: true,
+                            meta: {}
                         })
 
                         this.handleClose()

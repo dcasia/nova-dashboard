@@ -1,10 +1,10 @@
 <?php
 
-namespace DigitalCreative\NovaBi\Widgets;
+namespace DigitalCreative\NovaDashboard;
 
-use Laravel\Nova\Card;
+use Laravel\Nova\Card as BaseCard;
 
-class WidgetCard extends Card
+class Card extends BaseCard
 {
 
     public Widget $instance;

@@ -1,23 +1,14 @@
 <?php
 
-namespace DigitalCreative\NovaBi\Dashboards;
+namespace DigitalCreative\NovaDashboard;
 
-use DigitalCreative\NovaBi\Filters;
-use DigitalCreative\NovaBi\Widgets\Action;
-use DigitalCreative\NovaBi\Widgets\TitleableTrait;
-use DigitalCreative\NovaBi\Widgets\Value;
-use DigitalCreative\NovaBi\Widgets\View;
 use Illuminate\Support\Collection;
 use JsonSerializable;
-use Laravel\Nova\AuthorizedToSee;
-use Laravel\Nova\ProxiesCanSeeToGate;
 
 abstract class Dashboard implements JsonSerializable
 {
 
-    use AuthorizedToSee;
-    use ProxiesCanSeeToGate;
-    use TitleableTrait;
+    use DashboardTrait;
 
     public function options(): array
     {
@@ -37,7 +28,7 @@ abstract class Dashboard implements JsonSerializable
      *
      * @return mixed
      */
-    public function resolveValue(string $viewKey, string $widgetKey, Collection $options, Filters $filters): Value
+    public function resolveValue(string $viewKey, string $widgetKey, Collection $options, Filters $filters): ValueResult
     {
 
         if ($view = $this->findViewByKey($viewKey)) {
@@ -53,14 +44,7 @@ abstract class Dashboard implements JsonSerializable
     public function findViewByKey(string $key): ?View
     {
         return $this->resolveViews()->first(function (View $view) use ($key) {
-            return $view::uriKey() === $key;
-        });
-    }
-
-    public function findActionByKey(string $key): ?Action
-    {
-        return collect($this->actions())->first(function (Action $action) use ($key) {
-            return $action->uriKey() === $key;
+            return $view->uriKey() === $key;
         });
     }
 
@@ -73,23 +57,14 @@ abstract class Dashboard implements JsonSerializable
          */
         $view = $this->resolveViews()->first();
 
-        if ($view->isEditable()) {
-
-            return [
-                'uriKey' => $view::uriKey(),
-                'data' => $view->resolveDataFromDatabase(),
-            ];
-
-        }
-
         return [
-            'uriKey' => $view::uriKey(),
+            'uriKey' => $view->uriKey(),
             'data' => $view->resolveData(),
         ];
 
     }
 
-    private function resolveViews(): Collection
+    public function resolveViews(): Collection
     {
         return once(function () {
             return collect($this->views())
@@ -97,7 +72,7 @@ abstract class Dashboard implements JsonSerializable
                     return $view->authorizedToSee(request());
                 })
                 ->each
-                ->setDashboard(self::uriKey())
+                ->setDashboard($this->uriKey())
                 ->values();
         });
     }
@@ -106,7 +81,7 @@ abstract class Dashboard implements JsonSerializable
     {
         return [
             'title' => $this->title(),
-            'uriKey' => static::uriKey(),
+            'uriKey' => $this->uriKey(),
             'options' => $this->options(),
             'activeViewData' => $this->resolveActiveView(),
             'views' => $this->resolveViews(),

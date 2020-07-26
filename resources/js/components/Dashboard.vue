@@ -101,8 +101,8 @@
             <grid class="grid-stack flex-1 -mx-2 mt-8"
                   :options="options.grid"
                   :widgets="activeWidgets"
-                  :enable-edit="allowWidgetEditing"
-                  @update="updateCoordinates"
+                  :allow-edit="allowWidgetEditing"
+                  @moved="updateCoordinates"
                   @edit="editOption"/>
 
             <portal to="modals" transition="fade-transition">
@@ -140,10 +140,10 @@
 <script>
 
     import resource from '~~nova~~/store/resources'
-    import CreateWidgetModal from './CreateWidgetModal'
-    import EditWidgetModal from './EditWidgetModal'
-    import ActionModal from './ActionModal'
-    import ViewSelect from './ViewSelect'
+    import CreateWidgetModal from './Modals/CreateWidgetModal'
+    import EditWidgetModal from './Modals/EditWidgetModal'
+    import ActionModal from './Modals/ActionModal'
+    import ViewSelect from './Inputs/ViewSelect'
     import { Minimum } from 'laravel-nova'
     import Grid from './Grid'
     import { CollapseTransition, FadeTransition } from 'vue2-transitions'
@@ -161,7 +161,7 @@
         },
         data() {
 
-            const dashboardKey = this.$route.params.resource
+            const dashboardKey = this.$route.params.dashboardKey
 
             return {
                 selectedViewKey: null,
@@ -179,13 +179,16 @@
             }
 
         },
-        async mounted() {
+        mounted() {
 
-            const response = await Minimum(Nova.request()
-                .get(`/nova-vendor/nova-widgets/${ this.$route.params.resource }?editMode=create&editing=true`))
-                .catch(error => error.response)
-
-            if (response.status === 200) {
+            Minimum(Nova.request({
+                method: 'get',
+                url: `/nova-vendor/nova-dashboard/${ this.dashboardKey }`,
+                params: {
+                    editMode: 'create',
+                    editing: true
+                }
+            })).then(response => {
 
                 this.responseData = response.data
 
@@ -196,15 +199,19 @@
                 this.loading = false
                 this.initialize()
 
-            } else if (response.status === 404) {
+            }).catch(error => {
 
-                this.$router.push({ name: '404' })
+                if (error.response.status === 404) {
 
-            } else {
+                    this.$router.push({ name: '404' })
 
-                Nova.error(response.data.message)
+                } else {
 
-            }
+                    Nova.error(error.response.data.message)
+
+                }
+
+            })
 
         },
         watch: {
@@ -308,9 +315,11 @@
 
                 Nova.request({
                     method: 'get',
-                    url: '/nova-vendor/nova-widgets/widget/view',
+                    url: '/nova-vendor/nova-dashboard/widget/view',
                     cancelToken: currentToken.token,
                     params: {
+                        editMode: 'create',
+                        editing: true,
                         dashboard: this.dashboardKey,
                         view: viewKey
                     }
@@ -371,7 +380,7 @@
 
                 Nova.request({
                     method: 'post',
-                    url: '/nova-vendor/nova-widgets/widget/update-coordinates',
+                    url: '/nova-vendor/nova-dashboard/widget/update-coordinates',
                     data: {
                         id: widget.id,
                         dashboard: this.dashboardKey,
@@ -385,7 +394,7 @@
 
                 }).then(response => {
 
-                    Nova.$emit(`widget-${ widget.id }-updated`, widget)
+                    Nova.$emit(`widget-${ widget.id }-update-coordinates`, widget)
 
                 })
 
@@ -428,7 +437,7 @@
                 this.activeWidgets.push(widgetData)
 
             },
-            appendWidget({ data: { coordinates, id, options }, uriKey, editable }) {
+            appendWidget({ data: { coordinates, id, options, ...meta }, uriKey, editable }) {
 
                 const parsedOptions = {}
 
@@ -452,6 +461,7 @@
                 this.activeWidgets.push({
                     id,
                     editable,
+                    meta,
                     schema: this.schemas[ uriKey ],
                     options: parsedOptions,
                     coordinates: coordinates || { x: 0, y: 0, width: 2, height: 1 },

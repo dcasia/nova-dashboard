@@ -1,13 +1,13 @@
-import NovaWidget from './components/NovaWidget'
+import Dashboard from './components/Dashboard'
 import Widget from './components/Widget'
 
 Nova.booting((Vue, router, store) => {
 
     router.addRoutes([
         {
-            name: 'nova-widgets',
-            path: '/nova-widgets/:resource',
-            component: NovaWidget
+            name: 'nova-dashboard',
+            path: '/nova-dashboard/:dashboardKey',
+            component: Dashboard
         }
     ])
 
