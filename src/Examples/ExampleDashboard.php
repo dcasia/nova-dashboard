@@ -2,7 +2,6 @@
 
 namespace DigitalCreative\NovaDashboard\Examples;
 
-use App\Nova\Filters\TestFilter;
 use DigitalCreative\NovaDashboard\Dashboard;
 use DigitalCreative\NovaDashboard\Examples\Views\AnotherView;
 use DigitalCreative\NovaDashboard\Examples\Views\ProductsSalesView;
@@ -11,16 +10,6 @@ class ExampleDashboard extends Dashboard
 {
 
     public static string $title = 'Example Dashboard';
-
-    public function filters(): array
-    {
-        return [
-            (new TestFilter())->withMeta([ 'currentValue' => '2010-12-10' ]),
-            (new TestFilter())->withMeta([ 'currentValue' => '2010-12-10' ]),
-            (new TestFilter())->withMeta([ 'currentValue' => '2010-12-10' ]),
-            (new TestFilter())->withMeta([ 'currentValue' => '2010-12-10' ]),
-        ];
-    }
 
     public function views(): array
     {

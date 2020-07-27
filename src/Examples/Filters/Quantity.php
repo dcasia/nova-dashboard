@@ -3,7 +3,6 @@
 namespace DigitalCreative\NovaDashboard\Examples\Filters;
 
 use DigitalCreative\RangeInputFilter\RangeInputFilter;
-use DigitalCreative\SocialMediaWidget\Widgets\SocialMediaWidget;
 use Illuminate\Http\Request;
 
 class Quantity extends RangeInputFilter

@@ -3,7 +3,6 @@
 namespace DigitalCreative\NovaDashboard\Examples\Filters;
 
 use DigitalCreative\PillFilter\PillFilter;
-use DigitalCreative\SocialMediaWidget\Widgets\SocialMediaWidget;
 use Illuminate\Http\Request;
 
 class Category extends PillFilter

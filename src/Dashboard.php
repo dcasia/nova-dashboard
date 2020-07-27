@@ -16,10 +16,7 @@ abstract class Dashboard implements JsonSerializable
         return [];
     }
 
-    public function views(): array
-    {
-        return [];
-    }
+    abstract public function views(): array;
 
     /**
      * @param string $viewKey
