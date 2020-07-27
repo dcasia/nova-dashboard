@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalCreative\NovaDashboard\Examples\Filters;
+namespace DigitalCreative\NovaDashboard\Filters;
 
 use DigitalCreative\RangeInputFilter\RangeDateFilter;
 use DigitalCreative\SocialMediaWidget\Widgets\SocialMediaWidget;

@@ -1,13 +1,13 @@
 <?php
 
-namespace DigitalCreative\NovaDashboard\Examples\Views;
+namespace DigitalCreative\NovaDashboard\Views;
 
-use DigitalCreative\NovaDashboard\Examples\Actions\UniqueAction;
-use DigitalCreative\NovaDashboard\Examples\Filters\BooleanSelectFilter;
-use DigitalCreative\NovaDashboard\Examples\Filters\SingleDateFilter;
-use DigitalCreative\NovaDashboard\Examples\Widgets\ExampleWidgetOne;
-use DigitalCreative\NovaDashboard\Examples\Widgets\ExampleWidgetTwo;
+use DigitalCreative\NovaDashboard\Actions\UniqueAction;
+use DigitalCreative\NovaDashboard\Filters\BooleanSelectFilter;
+use DigitalCreative\NovaDashboard\Filters\SingleDateFilter;
 use DigitalCreative\NovaDashboard\View;
+use DigitalCreative\NovaDashboard\Widgets\ExampleWidgetOne;
+use DigitalCreative\NovaDashboard\Widgets\ExampleWidgetTwo;
 use DigitalCreative\SocialMediaWidget\Widgets\SocialMediaWidget;
 
 class AnotherView extends View

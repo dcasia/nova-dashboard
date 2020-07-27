@@ -1,11 +1,11 @@
 <?php
 
-namespace DigitalCreative\NovaDashboard\Examples\Widgets;
+namespace DigitalCreative\NovaDashboard\Widgets;
 
-use DigitalCreative\NovaDashboard\Examples\Filters\Category;
-use DigitalCreative\NovaDashboard\Examples\Filters\Date;
-use DigitalCreative\NovaDashboard\Examples\Filters\Quantity;
 use DigitalCreative\NovaDashboard\Filters;
+use DigitalCreative\NovaDashboard\Filters\Category;
+use DigitalCreative\NovaDashboard\Filters\Date;
+use DigitalCreative\NovaDashboard\Filters\Quantity;
 use DigitalCreative\ValueWidget\Widgets\ValueResult;
 use DigitalCreative\ValueWidget\Widgets\ValueWidget;
 use Illuminate\Support\Collection;

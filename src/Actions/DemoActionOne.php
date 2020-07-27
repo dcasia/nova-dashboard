@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalCreative\NovaDashboard\Examples\Actions;
+namespace DigitalCreative\NovaDashboard\Actions;
 
 use DigitalCreative\NovaDashboard\Action;
 use DigitalCreative\NovaDashboard\Filters;

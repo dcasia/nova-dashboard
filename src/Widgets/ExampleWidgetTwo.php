@@ -1,13 +1,13 @@
 <?php
 
-namespace DigitalCreative\NovaDashboard\Examples\Widgets;
+namespace DigitalCreative\NovaDashboard\Widgets;
 
 use DigitalCreative\NovaDashboard\Filters;
 use DigitalCreative\ValueWidget\Widgets\ValueResult;
 use DigitalCreative\ValueWidget\Widgets\ValueWidget;
 use Illuminate\Support\Collection;
 
-class ProductsInStock extends ValueWidget
+class ExampleWidgetTwo extends ValueWidget
 {
     public function resolveValue(Collection $options, Filters $filters): ValueResult
     {
