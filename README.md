@@ -6,7 +6,7 @@
 
 ![Laravel Nova Dashboard In Action](https://raw.githubusercontent.com/dcasia/nova-dashboard/master/demo.gif)
 
-The missing dashboard for nova!
+The missing dashboard for Laravel Nova!
 
 # Installation
 
@@ -188,7 +188,7 @@ int $x, int $y, int $width, int $height, array $options = []
 
 ##### Dynamic mode
 
-![Widgets Static Mode Preview](https://raw.githubusercontent.com/dcasia/nova-dashboard/master/screenshots/widget-1.png)
+![Widgets Static Mode Preview](https://raw.githubusercontent.com/dcasia/nova-dashboard/master/screenshots/widget-2.png)
 
 ```php
 public function widgets(): array
