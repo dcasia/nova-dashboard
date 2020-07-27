@@ -4,7 +4,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/digital-creative/nova-dashboard)](https://packagist.org/packages/digital-creative/nova-dashboard)
 [![License](https://img.shields.io/packagist/l/digital-creative/nova-dashboard)](https://github.com/dcasia/nova-dashboard/blob/master/LICENSE)
 
-![Laravel Nova Dashboard In Action](https://raw.githubusercontent.com/dcasia/nova-dashboard/master/demo.gif)
+![Laravel Nova Dashboard In Action](https://raw.githubusercontent.com/dcasia/nova-dashboard/master/screenshots/demo.gif)
 
 The missing dashboard for Laravel Nova!
 
