@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalCreative\NovaDashboard\Filters;
+namespace DigitalCreative\NovaDashboard\Examples\Filters;
 
 use DigitalCreative\PillFilter\PillFilter;
 use DigitalCreative\SocialMediaWidget\Widgets\SocialMediaWidget;

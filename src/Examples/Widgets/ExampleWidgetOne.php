@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalCreative\NovaDashboard\Widgets;
+namespace DigitalCreative\NovaDashboard\Examples\Widgets;
 
 use DigitalCreative\NovaDashboard\Filters;
 use DigitalCreative\ValueWidget\Widgets\ValueResult;

@@ -1,16 +1,16 @@
 <?php
 
-namespace DigitalCreative\NovaDashboard\Views;
+namespace DigitalCreative\NovaDashboard\Examples\Views;
 
-use DigitalCreative\NovaDashboard\Actions\DemoActionOne;
-use DigitalCreative\NovaDashboard\Actions\DemoActionTwo;
-use DigitalCreative\NovaDashboard\Filters\Category;
-use DigitalCreative\NovaDashboard\Filters\Date;
-use DigitalCreative\NovaDashboard\Filters\Quantity;
+use DigitalCreative\NovaDashboard\Examples\Actions\DemoActionOne;
+use DigitalCreative\NovaDashboard\Examples\Actions\DemoActionTwo;
+use DigitalCreative\NovaDashboard\Examples\Filters\Category;
+use DigitalCreative\NovaDashboard\Examples\Filters\Date;
+use DigitalCreative\NovaDashboard\Examples\Filters\Quantity;
+use DigitalCreative\NovaDashboard\Examples\Widgets\ConversionRate;
+use DigitalCreative\NovaDashboard\Examples\Widgets\ProductsInStock;
+use DigitalCreative\NovaDashboard\Examples\Widgets\TotalSales;
 use DigitalCreative\NovaDashboard\View;
-use DigitalCreative\NovaDashboard\Widgets\ConversionRate;
-use DigitalCreative\NovaDashboard\Widgets\ProductsInStock;
-use DigitalCreative\NovaDashboard\Widgets\TotalSales;
 use DigitalCreative\SocialMediaWidget\Widgets\SocialMediaWidget;
 
 class ProductsSalesView extends View
