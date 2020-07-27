@@ -89,7 +89,7 @@ class NovaDashboard extends Tool
         return once(function () {
             return collect($this->dashboards)
                 ->map(static function ($dashboard) {
-                    return resolve($dashboard);
+                    return $dashboard instanceof Dashboard ? $dashboard : resolve($dashboard);
                 })
                 ->filter(static function (Dashboard $dashboard) {
                     return $dashboard->authorizedToSee(request());
