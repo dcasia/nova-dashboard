@@ -220,7 +220,6 @@ Simply pass no arguments to it, a new button will appear on the dashboard which 
 
 - ChartJS Widget: [https://github.com/dcasia/chartjs-widget](https://github.com/dcasia/chartjs-widget)
 - Value Widget: [https://github.com/dcasia/value-widget](https://github.com/dcasia/value-widget)
-- Social Meida Widget: [https://github.com/dcasia/social-media-widget](https://github.com/dcasia/social-media-widget)
 - [Add your widget here.](https://github.com/dcasia/nova-dashboard/edit/master/README.md)
 
 ## Filters
