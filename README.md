@@ -16,6 +16,18 @@ You can install the package via composer:
 composer require digital-creative/nova-dashboard
 ```
 
+**Recommended:** Publish Configuration File for adjusting model and table names
+
+    php artisan vendor:publish --provider="DigitalCreative\NovaDashboard\ToolServiceProvider" --tag="config"
+
+Publish Migrations
+
+    php artisan vendor:publish --provider="DigitalCreative\NovaDashboard\ToolServiceProvider" --tag="migration"
+
+Run Migrations
+
+    php artisan migrate
+
 ## Usage
 
 Register the `NovaDashboard` tool within your `NovaServiceProvider.php`
@@ -206,7 +218,9 @@ Simply pass no arguments to it, a new button will appear on the dashboard which 
 
 ## List of current available widgets:
 
+- ChartJS Widget: [https://github.com/dcasia/chartjs-widget](https://github.com/dcasia/chartjs-widget)
 - Value Widget: [https://github.com/dcasia/value-widget](https://github.com/dcasia/value-widget)
+- Social Meida Widget: [https://github.com/dcasia/social-media-widget](https://github.com/dcasia/social-media-widget)
 - [Add your widget here.](https://github.com/dcasia/nova-dashboard/edit/master/README.md)
 
 ## Filters
