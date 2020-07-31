@@ -213,7 +213,12 @@ class WidgetController
         /**
          * Attempt to find the widget so authorization kicks in if user is unauthorized to interact with this resource
          */
-        $this->findWidgetKey($request, $dashboardKey, $viewKey, $widgetKey);
+        $widget = $this->findWidgetKey($request, $dashboardKey, $viewKey, $widgetKey);
+
+        /**
+         * $validate the request
+         */
+        $request->validate($widget->creationRules($request)->toArray());
 
         /**
          * @var WidgetModel $widgetInstance
