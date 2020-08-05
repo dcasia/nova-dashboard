@@ -71,7 +71,7 @@ abstract class Widget implements JsonSerializable
     /**
      * @return WidgetOptionTab|array
      */
-    public function resolveWidgetOptions()
+    public function widgetFields()
     {
         return [];
     }
@@ -164,7 +164,7 @@ abstract class Widget implements JsonSerializable
         return once(function () {
 
             $collection = collect();
-            $widgetSettings = $this->resolveWidgetOptions();
+            $widgetSettings = $this->widgetFields();
             $request = app(NovaRequest::class);
 
             if ($widgetSettings instanceof WidgetOptionTab) {
