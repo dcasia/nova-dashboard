@@ -20,6 +20,11 @@ abstract class Widget implements JsonSerializable
 
     public ?Preset $preset = null;
 
+    /**
+     * @var array|callable
+     */
+    public $defaultCallback = [];
+
     public function __construct()
     {
 
@@ -79,11 +84,20 @@ abstract class Widget implements JsonSerializable
     /**
      * Return the default data for static widgets
      *
-     * @return array
+     * @param array|callable $defaults
+     *
+     * @return Widget
      */
-    public function defaults(): array
+    public function default($defaults): self
     {
-        return [];
+        $this->defaultCallback = $defaults;
+
+        return $this;
+    }
+
+    private function resolveDefaults(): array
+    {
+        return is_callable($this->defaultCallback) ? $this->defaultCallback() : $this->defaultCallback;
     }
 
     public function resolveDottedOptions(): Collection
@@ -105,7 +119,7 @@ abstract class Widget implements JsonSerializable
         }
 
         $options = array_undot($options);
-        $defaults = $this->defaults();
+        $defaults = $this->resolveDefaults();
 
         return $this->dotArray(array_merge_recursive_distinct($options, $defaults));
 
@@ -132,7 +146,7 @@ abstract class Widget implements JsonSerializable
         }
 
         $options = array_undot($options);
-        $defaults = $this->defaults();
+        $defaults = $this->resolveDefaults();
 
         return collect(
             array_merge_recursive_distinct($options, $defaults)
@@ -181,7 +195,7 @@ abstract class Widget implements JsonSerializable
                 $collection->prepend([
                     'title' => $this->fieldsTabTitle(),
                     'key' => 'userDefinedSettings',
-                    'fields' => $clientFields->toArray()
+                    'fields' => $clientFields->toArray(),
                 ]);
 
             }
@@ -199,7 +213,7 @@ abstract class Widget implements JsonSerializable
             'fields' => [
                 Text::make(__('Title'), 'widget_title')->default($this->title()),
                 Textarea::make(__('Help'), 'widget_help'),
-            ]
+            ],
         ];
     }
 
@@ -263,7 +277,7 @@ abstract class Widget implements JsonSerializable
         return collect(Arr::dot($options))
             ->mapWithKeys(static function ($value, string $attribute) {
                 return [
-                    Str::of($attribute)->replace('.', WidgetOptionTab::ATTRIBUTE_SEPARATOR)->__toString() => $value
+                    Str::of($attribute)->replace('.', WidgetOptionTab::ATTRIBUTE_SEPARATOR)->__toString() => $value,
                 ];
             });
     }

@@ -44,7 +44,7 @@ class View implements JsonSerializable
 
         if ($widget = $this->findWidgetByKey($widgetKey)) {
 
-            return $widget->resolveValue($options, $filters);
+            return $widget->resolveValue($widget->resolveDefaultOptions()->merge($options), $filters);
 
         }
 
