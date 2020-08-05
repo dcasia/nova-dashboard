@@ -249,7 +249,7 @@ abstract class Widget implements JsonSerializable
     {
         return $this->withMeta([
             'id' => $preset->id,
-            'options' => $preset->resolveOptions(),
+            'options' => $this->jsonSerializeOptions(collect($this->resolveDefaults())),
             'coordinates' => $preset->resolveCoordinates(),
         ]);
     }
