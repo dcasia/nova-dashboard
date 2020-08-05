@@ -23,7 +23,7 @@ abstract class Widget implements JsonSerializable
     /**
      * @var array|callable
      */
-    public $defaultCallback = [];
+    public $default = [];
 
     public function __construct()
     {
@@ -90,14 +90,14 @@ abstract class Widget implements JsonSerializable
      */
     public function default($defaults): self
     {
-        $this->defaultCallback = $defaults;
+        $this->default = $defaults;
 
         return $this;
     }
 
     private function resolveDefaults(): array
     {
-        return is_callable($this->defaultCallback) ? $this->defaultCallback() : $this->defaultCallback;
+        return is_callable($this->default) ? $this->default() : $this->default;
     }
 
     public function resolveDottedOptions(): Collection
