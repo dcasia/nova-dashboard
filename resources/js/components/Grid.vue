@@ -40,7 +40,7 @@
 
                 </div>
 
-                <div class="absolute pin-r pin-b m-2 z-20" v-if="widget.meta.help || widget.options.help">
+                <div class="absolute pin-r pin-b m-2 z-20" v-if="widget.options.widget_help">
 
                     <tooltip trigger="hover">
 
@@ -51,7 +51,7 @@
                               class="cursor-pointer text-60 -mb-1"/>
 
                         <tooltip-content slot="content"
-                                         v-html="widget.meta.help || widget.options.help"
+                                         v-html="widget.options.widget_help"
                                          :max-width="200"/>
 
                     </tooltip>
@@ -72,74 +72,74 @@
 
 <script>
 
-    import { Dashboard, DashItem, DashLayout } from 'vue-responsive-dash'
+import { Dashboard, DashItem, DashLayout } from 'vue-responsive-dash'
 
-    export default {
-        name: 'Grid',
-        props: [ 'widgets', 'options', 'allowEdit' ],
-        components: {
-            Dashboard,
-            DashLayout,
-            DashItem
-        }
+export default {
+    name: 'Grid',
+    props: [ 'widgets', 'options', 'allowEdit' ],
+    components: {
+        Dashboard,
+        DashLayout,
+        DashItem
     }
+}
 
 </script>
 
 <style lang="scss">
 
-    .grid__content {
+.grid__content {
 
-        height: 100%;
-        width: 100%;
-        overflow: hidden;
-        border-radius: .5rem;
-        user-select: text;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    border-radius: .5rem;
+    user-select: text;
 
+}
+
+.grid__settings {
+
+    color: var(--60);
+
+}
+
+.grid__resize-handler {
+    border: 2px solid var(--60);
+    width: 1rem;
+    height: 1rem;
+    border-radius: .5rem;
+    display: table;
+    position: absolute;
+    right: -0.6rem;
+    bottom: -0.6rem;
+    background: var(--60);
+    transition: all 200ms;
+
+    &:hover {
+        border-radius: 0;
+        right: -0.4rem;
+        bottom: -0.4rem;
     }
 
-    .grid__settings {
+}
 
-        color: var(--60);
+div[id$="Placeholder"] .placeholder {
+    border-radius: .5rem;
+    background-color: var(--60)
+}
 
-    }
+div[id$="-resizeBottomRight"] {
 
-    .grid__resize-handler {
-        border: 2px solid var(--60);
-        width: 1rem;
-        height: 1rem;
-        border-radius: .5rem;
-        display: table;
-        position: absolute;
-        right: -0.6rem;
-        bottom: -0.6rem;
-        background: var(--60);
-        transition: all 200ms;
+    width: 15px !important;
+    height: 15px !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    resize: none;
+    border-radius: .5rem;
 
-        &:hover {
-            border-radius: 0;
-            right: -0.4rem;
-            bottom: -0.4rem;
-        }
-
-    }
-
-    div[id$="Placeholder"] .placeholder {
-        border-radius: .5rem;
-        background-color: var(--60)
-    }
-
-    div[id$="-resizeBottomRight"] {
-
-        width: 15px !important;
-        height: 15px !important;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
-        resize: none;
-        border-radius: .5rem;
-
-    }
+}
 
 </style>

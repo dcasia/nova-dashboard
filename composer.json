@@ -10,12 +10,16 @@
     ],
     "license": "MIT",
     "require": {
-        "php": ">=7.3"
+        "php": ">=7.4",
+        "divineomega/array_undot": "^4.1"
     },
     "autoload": {
         "psr-4": {
             "DigitalCreative\\NovaDashboard\\": "src/"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "extra": {
         "laravel": {

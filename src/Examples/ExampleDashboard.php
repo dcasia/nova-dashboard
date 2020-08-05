@@ -14,8 +14,8 @@ class ExampleDashboard extends Dashboard
     public function views(): array
     {
         return [
-            new ProductsSalesView(),
-            AnotherView::make()->editable()
+            AnotherView::make()->editable(),
+            ProductsSalesView::make(),
         ];
     }
 

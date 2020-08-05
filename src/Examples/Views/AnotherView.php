@@ -5,6 +5,7 @@ namespace DigitalCreative\NovaDashboard\Examples\Views;
 use DigitalCreative\NovaDashboard\Examples\Actions\UniqueAction;
 use DigitalCreative\NovaDashboard\Examples\Filters\BooleanSelectFilter;
 use DigitalCreative\NovaDashboard\Examples\Filters\SingleDateFilter;
+use DigitalCreative\NovaDashboard\Examples\Widgets\BarChartExampleWidget;
 use DigitalCreative\NovaDashboard\Examples\Widgets\ExampleWidgetOne;
 use DigitalCreative\NovaDashboard\Examples\Widgets\ExampleWidgetTwo;
 use DigitalCreative\NovaDashboard\View;
@@ -33,6 +34,7 @@ class AnotherView extends View
         return [
             new ExampleWidgetOne(),
             new ExampleWidgetTwo(),
+            new BarChartExampleWidget()
         ];
     }
 

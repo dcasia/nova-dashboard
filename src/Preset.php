@@ -2,6 +2,7 @@
 
 namespace DigitalCreative\NovaDashboard;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Laravel\Nova\Makeable;
 
@@ -9,7 +10,6 @@ class Preset
 {
     use Makeable;
 
-    public array $options = [];
     public int $x = 0;
     public int $y = 0;
     public int $width = 0;
@@ -28,13 +28,6 @@ class Preset
         $this->widget = $widget;
     }
 
-    public function options(array $options): self
-    {
-        $this->options = $options;
-
-        return $this;
-    }
-
     public function coordinates(int $x, int $y, int $width, int $height): self
     {
         $this->x = $x;
@@ -45,9 +38,9 @@ class Preset
         return $this;
     }
 
-    public function resolveOptions(): array
+    public function resolveOptions(): Collection
     {
-        return array_merge($this->widget->resolveOptions(), $this->options);
+        return $this->widget->resolveDefaultOptions();
     }
 
     public function resolveCoordinates(): array

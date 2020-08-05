@@ -4,6 +4,7 @@ namespace DigitalCreative\NovaDashboard\Http\Controllers;
 
 use DigitalCreative\NovaDashboard\Action;
 use DigitalCreative\NovaDashboard\Card;
+use DigitalCreative\NovaDashboard\WidgetOptionTab;
 use DigitalCreative\NovaDashboard\Dashboard;
 use DigitalCreative\NovaDashboard\Filters;
 use DigitalCreative\NovaDashboard\Models\Widget as WidgetModel;
@@ -13,6 +14,7 @@ use DigitalCreative\NovaDashboard\View;
 use DigitalCreative\NovaDashboard\Widget;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Laravel\Nova\Fields\ActionFields;
 use Laravel\Nova\Fields\Field;
@@ -103,13 +105,12 @@ class WidgetController
 
     }
 
-    public function createWidget(NovaRequest $request): int
+    public function createWidget(NovaRequest $request): JsonResponse
     {
 
         $dashboardKey = $request->query('dashboard');
         $viewKey = $request->query('view');
         $widgetKey = $request->query('widget');
-        $options = $request->post();
 
         $widget = $this->findWidgetKey($request, $dashboardKey, $viewKey, $widgetKey);
 
@@ -118,7 +119,12 @@ class WidgetController
          */
         $request->validate($widget->creationRules($request)->toArray());
 
-        return $this->storeWidget($request, $dashboardKey, $viewKey, $widgetKey, $options)->id;
+        $widgetModel = $this->storeWidget($request, $dashboardKey, $viewKey, $widgetKey, $widget->resolveFields());
+
+        return response()->json([
+            'id' => $widgetModel->id,
+            'options' => $widget->jsonSerializeOptions($widgetModel->options)
+        ]);
 
     }
 
@@ -162,7 +168,7 @@ class WidgetController
 
     }
 
-    private function storeWidget(NovaRequest $request, string $dashboardKey, string $viewKey, string $widgetKey, array $options): WidgetModel
+    private function storeWidget(NovaRequest $request, string $dashboardKey, string $viewKey, string $widgetKey, Collection $fields): WidgetModel
     {
 
         /**
@@ -175,11 +181,35 @@ class WidgetController
         $widgetInstance->setAttribute('key', $widgetKey);
         $widgetInstance->setAttribute('dashboard', $dashboardKey);
         $widgetInstance->setAttribute('view', $viewKey);
-        $widgetInstance->setAttribute('options', $options);
+        $widgetInstance->setAttribute('options', $this->parseOptions($request, $fields));
         $widgetInstance->setAttribute('user_id', $request->user()->id);
         $widgetInstance->save();
 
         return $widgetInstance;
+
+    }
+
+    private function parseOptions(NovaRequest $request, Collection $fields): array
+    {
+
+        $data = new Fluent();
+
+        /**
+         * @var Field $field
+         */
+        foreach ($fields as $field) {
+
+            $field->fillForAction($request, $data);
+
+        }
+
+        $options = collect($data)->mapWithKeys(static function ($value, $key) {
+            return [
+                str_replace(WidgetOptionTab::ATTRIBUTE_SEPARATOR, '.', $key) => $value
+            ];
+        });
+
+        return array_undot($options->toArray());
 
     }
 
@@ -216,7 +246,7 @@ class WidgetController
         $widget = $this->findWidgetKey($request, $dashboardKey, $viewKey, $widgetKey);
 
         /**
-         * $validate the request
+         * Validate the request
          */
         $request->validate($widget->creationRules($request)->toArray());
 
@@ -224,7 +254,8 @@ class WidgetController
          * @var WidgetModel $widgetInstance
          */
         $widgetInstance = $this->widgetModel()->newQuery()->whereKey($id)->firstOrFail();
-        $widgetInstance->setAttribute('options', $request->post());
+        $options = $this->parseOptions($request, $widget->resolveFields());
+        $widgetInstance->setAttribute('options', $options);
         $widgetInstance->save();
 
         return response()->json($widgetInstance->id);
@@ -269,7 +300,7 @@ class WidgetController
         $dashboardKey = $request->input('dashboard');
         $viewKey = $request->input('view');
         $widgetKey = $request->input('widget');
-        $options = $request->input('options');
+        $options = $request->input('options', []);
 
         $view = $this->findViewByKey($request, $dashboardKey, $viewKey);
         $filters = new Filters($filters, $view->filters());

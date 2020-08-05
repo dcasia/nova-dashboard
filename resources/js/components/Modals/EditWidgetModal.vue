@@ -11,41 +11,54 @@
                 <heading :level="2" class="mb-6">{{ __('Update Widget') }}</heading>
             </div>
 
-            <div v-for="field in fields">
+            <Tabs :headers="headers" ref="tabs">
 
-                <component :is="'form-' + field.component"
-                           :resource-name="dashboardKey"
-                           :field="field"
-                           :errors="errors"/>
+                <template v-for="tab of schemeTabs" :slot="tab.key" slot-scope="{ show }">
 
-            </div>
+                    <div v-show="show">
+
+                        <component v-for="field in tab.fields"
+                                   :key="field.attribute"
+                                   :is="'form-' + field.component"
+                                   :resource-name="dashboardKey"
+                                   :field="field"
+                                   :errors="errors"/>
+
+                    </div>
+
+                </template>
+
+            </Tabs>
 
             <div class="bg-30 px-6 py-3 flex">
 
-                <button type="button"
-                        @click.prevent="handleDelete"
-                        class="btn btn-default btn-danger">
+                <progress-button @click.native="handleDelete"
+                                 class="btn-danger"
+                                 :disabled="createWorking || deleteWorking"
+                                 :processing="deleteWorking">
 
                     {{ __('Delete') }}
 
-                </button>
+                </progress-button>
 
                 <div class="ml-auto">
 
                     <button type="button"
                             @click.prevent="handleClose"
+                            :disabled="createWorking || deleteWorking"
                             class="btn text-80 font-normal h-9 px-3 mr-3 btn-link">
 
                         {{ __('Cancel') }}
 
                     </button>
 
-                    <button type="submit"
-                            class="btn btn-default btn-primary">
+                    <progress-button @click.native="handleConfirm"
+                                     :disabled="createWorking || deleteWorking"
+                                     :processing="createWorking">
 
                         {{ __('Update') }}
 
-                    </button>
+                    </progress-button>
 
                 </div>
 
@@ -59,45 +72,80 @@
 
 <script>
 
-    import { Errors } from 'laravel-nova'
+import { Errors } from 'laravel-nova'
+import Tabs from '../Tabs'
+import { dotter } from '../../helpers'
 
-    export default {
-        props: {
-            dashboardKey: { type: String, required: true },
-            viewKey: { type: String, required: true },
-            widget: { type: Object }
+export default {
+    name: 'EditWidgetModal',
+    components: { Tabs },
+    props: {
+        dashboardKey: { type: String, required: true },
+        viewKey: { type: String, required: true },
+        widget: { type: Object, required: true }
+    },
+    data() {
+
+        return {
+            createWorking: false,
+            deleteWorking: false,
+            errors: new Errors
+        }
+
+    },
+    computed: {
+        namespace() {
+
+            return [ this.dashboardKey, this.viewKey, this.widget.widgetKey, this.widget.id ].join('/')
+
         },
-        data() {
+        headers() {
 
-            return {
-                errors: new Errors
+            return this.schemeTabs.map(({ title, key }) => ( { title, key } ))
+
+        },
+        schemeTabs() {
+
+            const tabs = _.cloneDeep(this.widget.schema.tabs || [])
+            const options = this.$store.getters[ `${ this.namespace }/options` ]
+
+            for (const tab of tabs) {
+
+                for (const field of tab.fields) {
+
+
+                    const value = dotter.pick(field.attribute, options)
+                    if (value !== undefined) {
+
+                        field.value = value
+
+                    }
+
+                }
+
             }
 
+            return tabs
+
         },
-        computed: {
-            selectedWidget() {
+        schemeFields() {
 
-                return this.widgets.find(widget => widget.uriKey === this.selectedWidgetKey)
+            return _.flatten(this.schemeTabs.map(tab => tab.fields))
 
-            },
-            fields() {
+        }
+    },
+    methods: {
+        updateActiveTab() {
 
-                const options = this.widget.options || {}
-                const fields = this.widget.schema.fields || []
+            for (const errorKey in this.errors.all()) {
 
-                for (const attribute in options) {
+                for (const tab of this.schemeTabs) {
 
-                    const option = fields.find(option => option.attribute === attribute)
+                    for (const field of tab.fields) {
 
-                    if (option) {
+                        if (field.attribute === errorKey) {
 
-                        try {
-
-                            option.value = JSON.parse(options[ attribute ])
-
-                        } catch {
-
-                            option.value = options[ attribute ]
+                            this.$refs.tabs.setActiveTab(tab.key)
 
                         }
 
@@ -105,112 +153,104 @@
 
                 }
 
-                return fields
-
             }
+
         },
-        methods: {
-            handleDelete() {
+        handleDelete() {
 
-                this.working = true
+            this.deleteWorking = true
 
-                Nova.request({
-                    method: 'post',
-                    url: '/nova-vendor/nova-dashboard/widget/delete',
-                    data: {
-                        id: this.widget.id,
-                        dashboard: this.dashboardKey,
-                        view: this.viewKey,
-                        widget: this.widget.widgetKey
-                    }
-                })
-                    .then(response => {
+            Nova.request({
+                method: 'post',
+                url: '/nova-vendor/nova-dashboard/widget/delete',
+                data: {
+                    id: this.widget.id,
+                    dashboard: this.dashboardKey,
+                    view: this.viewKey,
+                    widget: this.widget.widgetKey
+                }
+            })
+                .then(response => {
 
-                        if (response.data) {
+                    if (response.data) {
 
-                            this.$emit('deleted', this.widget.id)
+                        this.$emit('deleted', this.widget.id)
 
-                        } else {
-
-                            Nova.error(this.__('There was a problem deleting the widget.'))
-
-                        }
-
-                    })
-                    .catch(error => {
-
-                        this.working = false
+                    } else {
 
                         Nova.error(this.__('There was a problem deleting the widget.'))
 
-                    })
+                    }
 
-            },
-            handleClose() {
-
-                this.$emit('close')
-
-            },
-            handleConfirm() {
-
-                this.working = true
-
-                const formData = new FormData()
-
-                for (const field of this.fields) field.fill(formData)
-
-                Nova.request({
-                    method: 'post',
-                    url: '/nova-vendor/nova-dashboard/widget/update',
-                    params: {
-                        id: this.widget.id,
-                        dashboard: this.dashboardKey,
-                        view: this.viewKey,
-                        widget: this.widget.widgetKey
-                    },
-                    data: formData
                 })
-                    .then(response => {
+                .catch(error => {
 
-                        const options = {}
+                    this.deleteWorking = false
 
-                        /**
-                         * Decode every nested json string into an object
-                         */
-                        formData.forEach((value, key) => {
+                    Nova.error(this.__('There was a problem deleting the widget.'))
 
-                            try {
+                })
 
-                                options[ key ] = JSON.parse(value)
+        },
+        handleClose() {
 
-                            } catch {
+            this.$emit('close')
 
-                                options[ key ] = value
+        },
+        handleConfirm() {
 
-                            }
+            this.createWorking = true
 
-                        })
+            const formData = new FormData()
 
-                        this.$emit('updated', this.widget.id, options)
+            for (const field of this.schemeFields) field.fill(formData)
 
-                        this.working = false
+            Nova.request({
+                method: 'post',
+                url: '/nova-vendor/nova-dashboard/widget/update',
+                params: {
+                    id: this.widget.id,
+                    dashboard: this.dashboardKey,
+                    view: this.viewKey,
+                    widget: this.widget.widgetKey,
+                    filters: this.$store.getters[ `${ this.dashboardKey }/currentEncodedFilters` ]
+                },
+                data: formData
+            })
+                .then(response => {
+
+                    this.handleClose()
+
+                    const data = {}
+
+                    formData.forEach((value, key) => data[ key ] = value)
+
+                    this.$store.commit(`${ this.namespace }/updateOptions`, data)
+
+                    this.$nextTick(() => {
+
+                        this.$emit('updated', response.data)
+                        Nova.$emit(`widget-${ response.data }-updated`)
 
                     })
-                    .catch(error => {
 
-                        this.working = false
+                })
+                .catch(error => {
 
-                        if (error.response.status === 422) {
-                            this.errors = new Errors(error.response.data.errors)
-                            Nova.error(this.__('There was a problem creating the widget.'))
-                        }
+                    this.createWorking = false
 
-                    })
+                    if (error.response.status === 422) {
+                        this.errors = new Errors(error.response.data.errors)
+                        this.updateActiveTab()
+                        Nova.error(this.__('There was a problem creating the widget.'))
+                    }
 
-            }
+                })
 
         }
 
     }
+
+}
 
 </script>

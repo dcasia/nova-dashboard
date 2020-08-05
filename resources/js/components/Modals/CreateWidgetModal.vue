@@ -18,14 +18,24 @@
                          :placeholder="placeholder"
                          @input="onWidgetSelected"/>
 
-            <div v-for="field in fields">
+            <Tabs v-if="selectedSchemaKey" :headers="headers" ref="tabs">
 
-                <component :is="'form-' + field.component"
-                           :resource-name="dashboardKey"
-                           :field="field"
-                           :errors="errors"/>
+                <template v-for="tab of selectedSchema.tabs" :slot="tab.key" slot-scope="{ show }">
 
-            </div>
+                    <div v-show="show">
+
+                        <component v-for="field in tab.fields"
+                                   :key="field.attribute"
+                                   :is="'form-' + field.component"
+                                   :resource-name="dashboardKey"
+                                   :field="field"
+                                   :errors="errors"/>
+
+                    </div>
+
+                </template>
+
+            </Tabs>
 
             <div class="bg-30 px-6 py-3 flex">
 
@@ -59,135 +69,149 @@
 
 <script>
 
-    import SelectInput from '../Inputs/SelectInput'
-    import { Errors } from 'laravel-nova'
+import SelectInput from '../Inputs/SelectInput'
+import { Errors } from 'laravel-nova'
+import Tabs from '../Tabs'
 
-    export default {
-        name: 'CreateWidgetModal',
-        components: { SelectInput },
-        props: {
-            dashboardKey: { type: String, required: true },
-            viewKey: { type: String, required: true },
-            schemas: { type: Object, required: true }
-        },
-        data() {
+export default {
+    name: 'CreateWidgetModal',
+    components: { SelectInput, Tabs },
+    props: {
+        dashboardKey: { type: String, required: true },
+        viewKey: { type: String, required: true },
+        schemas: { type: Object, required: true }
+    },
+    data() {
 
-            return {
-                working: false,
-                errors: new Errors,
-                label: this.__('Type'),
-                placeholder: this.__('Choose an option'),
-                selectedSchemaKey: null,
-                options: _.keys(this.schemas).map(uriKey => {
+        return {
+            working: false,
+            errors: new Errors,
+            label: this.__('Type'),
+            placeholder: this.__('Choose an option'),
+            selectedSchemaKey: null,
+            options: _.keys(this.schemas).map(uriKey => {
 
-                    return {
-                        label: this.schemas[ uriKey ].title,
-                        value: uriKey
-                    }
+                return {
+                    label: this.schemas[ uriKey ].title,
+                    value: uriKey
+                }
 
-                })
+            })
+        }
+
+    },
+    computed: {
+        tabs() {
+
+            if (this.selectedSchema) {
+
+                return this.selectedSchema.tabs
+
             }
 
+            return []
+
         },
-        computed: {
-            selectedSchema() {
+        headers() {
 
-                return this.schemas[ this.selectedSchemaKey ]
+            return this.tabs.map(({ title, key }) => ( { title, key } ))
 
-            },
-            fields() {
+        },
+        selectedSchema() {
 
-                if (this.selectedSchema) {
+            return this.schemas[ this.selectedSchemaKey ]
 
-                    return this.selectedSchema.fields || []
+        },
+        fields() {
+
+            return _.flatten(this.tabs.map(tab => tab.fields))
+
+        }
+    },
+    methods: {
+        updateActiveTab() {
+
+            for (const errorKey in this.errors.all()) {
+
+                for (const tab of this.selectedSchema.tabs) {
+
+                    for (const field of tab.fields) {
+
+                        if (field.attribute === errorKey) {
+
+                            this.$refs.tabs.setActiveTab(tab.key)
+
+                        }
+
+                    }
 
                 }
 
-                return []
-
             }
+
         },
-        methods: {
-            handleClose() {
+        handleClose() {
 
-                this.$emit('close')
+            this.$emit('close')
 
-            },
-            onWidgetSelected(value) {
+        },
+        onWidgetSelected(value) {
 
-                this.selectedSchemaKey = value
+            this.selectedSchemaKey = value
 
-            },
-            handleConfirm() {
+        },
+        handleConfirm() {
 
-                this.working = true
+            this.working = true
 
-                const formData = new FormData()
+            const formData = new FormData()
 
-                for (const field of this.fields) field.fill(formData)
+            for (const field of this.fields) field.fill(formData)
 
-                Nova.request({
-                    method: 'post',
-                    url: '/nova-vendor/nova-dashboard/widget/create',
-                    params: {
-                        dashboard: this.dashboardKey,
-                        view: this.viewKey,
-                        widget: this.selectedSchemaKey
-                    },
-                    data: formData
+            Nova.request({
+                method: 'post',
+                url: '/nova-vendor/nova-dashboard/widget/create',
+                params: {
+                    dashboard: this.dashboardKey,
+                    view: this.viewKey,
+                    widget: this.selectedSchemaKey
+                },
+                data: formData
+            })
+                .then(response => {
+
+                    this.$emit('created', {
+                        id: response.data.id,
+                        schema: this.selectedSchema,
+                        coordinates: { x: 0, y: 0, width: 2, height: 1 },
+                        widgetKey: this.selectedSchemaKey,
+                        dashboardKey: this.dashboardKey,
+                        viewKey: this.viewKey,
+                        options: response.data.options,
+                        editable: true,
+                        meta: {}
+                    })
+
+                    this.handleClose()
+                    this.working = false
+
                 })
-                    .then(response => {
+                .catch(error => {
 
-                        const options = {}
+                    this.working = false
 
-                        /**
-                         * Decode every nested json string into an object
-                         */
-                        formData.forEach((value, key) => {
+                    if (error.response.status === 422) {
+                        this.errors = new Errors(error.response.data.errors)
+                        this.updateActiveTab()
+                        Nova.error(this.__('There was a problem creating the widget.'))
+                    }
 
-                            try {
-
-                                options[ key ] = JSON.parse(value)
-
-                            } catch {
-
-                                options[ key ] = value
-
-                            }
-
-                        })
-
-                        this.$emit('created', {
-                            id: response.data,
-                            schema: this.selectedSchema,
-                            coordinates: { x: 0, y: 0, width: 2, height: 1 },
-                            widgetKey: this.selectedSchemaKey,
-                            dashboardKey: this.dashboardKey,
-                            viewKey: this.viewKey,
-                            options: options,
-                            editable: true,
-                            meta: {}
-                        })
-
-                        this.handleClose()
-                        this.working = false
-
-                    })
-                    .catch(error => {
-
-                        this.working = false
-
-                        if (error.response.status === 422) {
-                            this.errors = new Errors(error.response.data.errors)
-                            Nova.error(this.__('There was a problem creating the widget.'))
-                        }
-
-                    })
-
-            }
+                })
 
         }
 
     }
+
+}
 
 </script>
