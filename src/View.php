@@ -92,7 +92,7 @@ class View implements JsonSerializable
 
     public function isEditable(): bool
     {
-        return $this->meta('editable');
+        return value($this->meta('editable'));
     }
 
     public function resolveFilters(): Collection
