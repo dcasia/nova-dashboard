@@ -4,7 +4,7 @@
 
         <div v-if="loading" style="height: 300px"/>
 
-        <template v-else>
+        <div v-else :key="selectedViewKey">
 
             <card class="flex p-4 justify-between nova-bi__menu"
                   :class="{ 'rounded-b-none p-8': shouldExpandFilterView }">
@@ -131,7 +131,7 @@
 
             </portal>
 
-        </template>
+        </div>
 
     </loading-card>
 
@@ -139,364 +139,364 @@
 
 <script>
 
-import resource from '~~nova~~/store/resources'
-import CreateWidgetModal from './Modals/CreateWidgetModal'
-import EditWidgetModal from './Modals/EditWidgetModal'
-import ActionModal from './Modals/ActionModal'
-import ViewSelect from './Inputs/ViewSelect'
-import { Minimum } from 'laravel-nova'
-import Grid from './Grid'
-import { CollapseTransition, FadeTransition } from 'vue2-transitions'
+    import resource from '~~nova~~/store/resources'
+    import CreateWidgetModal from './Modals/CreateWidgetModal'
+    import EditWidgetModal from './Modals/EditWidgetModal'
+    import ActionModal from './Modals/ActionModal'
+    import ViewSelect from './Inputs/ViewSelect'
+    import { Minimum } from 'laravel-nova'
+    import Grid from './Grid'
+    import { CollapseTransition, FadeTransition } from 'vue2-transitions'
 
-export default {
-    name: 'Dashboard',
-    components: {
-        CreateWidgetModal,
-        EditWidgetModal,
-        Grid,
-        CollapseTransition,
-        FadeTransition,
-        ActionModal,
-        ViewSelect
-    },
-    data() {
+    export default {
+        name: 'Dashboard',
+        components: {
+            CreateWidgetModal,
+            EditWidgetModal,
+            Grid,
+            CollapseTransition,
+            FadeTransition,
+            ActionModal,
+            ViewSelect
+        },
+        data() {
 
-        const dashboardKey = this.$route.params.dashboardKey
+            const dashboardKey = this.$route.params.dashboardKey
 
-        return {
-            selectedViewKey: null,
-            selectedViewData: [],
-            loading: true,
-            dashboardKey,
-            cancelToken: null,
-            responseData: null,
-            openFilterView: true,
-            selectedWidgetForEditing: null,
-            activeWidgets: [],
-            closeWidgetCreationModal: true,
-            closeActionModal: true,
-            closeWidgetEditModal: true
-        }
-
-    },
-    mounted() {
-
-        Minimum(Nova.request({
-            method: 'get',
-            url: `/nova-vendor/nova-dashboard/${ this.dashboardKey }`,
-            params: {
-                editMode: 'create',
-                editing: true
+            return {
+                selectedViewKey: null,
+                selectedViewData: [],
+                loading: true,
+                dashboardKey,
+                cancelToken: null,
+                responseData: null,
+                openFilterView: true,
+                selectedWidgetForEditing: null,
+                activeWidgets: [],
+                closeWidgetCreationModal: true,
+                closeActionModal: true,
+                closeWidgetEditModal: true
             }
-        })).then(response => {
-
-            this.responseData = response.data
-
-            /**
-             * Initialize Vuex
-             */
-            this.$store.registerModule(this.dashboardKey, resource)
-            this.loading = false
-            this.openFilterView = this.options.expandFilterByDefault
-
-            if (!this.selectedViewKey && this.responseData.activeViewData) {
-
-                this.selectedViewKey = this.responseData.activeViewData.uriKey
-                this.selectedViewData = this.responseData.activeViewData.data
-
-            }
-
-        }).catch(error => {
-
-            if (error.response.status === 404) {
-
-                this.$router.push({ name: '404' })
-
-            } else {
-
-                Nova.error(error.response.data.message)
-
-            }
-
-        })
-
-    },
-    watch: {
-        selectedViewKey() {
-
-            this.$store.commit(`${ this.dashboardKey }/storeFilters`, this.filters)
-            this.activeWidgets = []
-
-            /**
-             * Give some time for the transition to finish
-             */
-            setTimeout(() => this.initialize(), 250)
-
-        }
-    },
-    computed: {
-        allowWidgetEditing() {
-
-            return this.activeView.meta[ 'editable' ] ?? false
 
         },
-        shouldExpandFilterView() {
+        mounted() {
 
-            if (this.filters.length === 0) {
-
-                return false
-
-            }
-
-            return this.openFilterView
-
-        },
-        activeView() {
-
-            return this.responseData.views.find(view => view.uriKey === this.selectedViewKey)
-
-        },
-        actions() {
-
-            if (this.activeView) {
-
-                return this.activeView.actions
-
-            }
-
-            return this.responseData.actions
-
-        },
-        filters() {
-
-            if (this.activeView) {
-
-                return this.activeView.filters
-
-            }
-
-            return this.responseData.filters
-
-        },
-        views() {
-            return this.responseData.views
-        },
-        schemas() {
-
-            if (this.activeView) {
-
-                return this.activeView.schemas
-
-            }
-
-            return {}
-
-        },
-        options() {
-            return _.merge({
-                enableAddWidgetButton: true,
-                enableWidgetEditing: true,
-                expandFilterByDefault: true,
-                grid: {
-                    useCssTransforms: false,
-                    breakpoint: 'none',
-                    numberOfCols: 6,
-                    compact: false,
-                    breakpointWidth: Infinity,
-                    rowHeight: 150
-                }
-            }, this.responseData.options)
-        }
-    },
-    methods: {
-        debouncer: _.debounce(callback => callback(), 100),
-        onViewSelected(viewKey) {
-
-            if (this.cancelToken) {
-
-                this.cancelToken.cancel('Operation canceled by the user.')
-
-            }
-
-            const currentToken = this.cancelToken = axios.CancelToken.source()
-
-            Nova.request({
+            Minimum(Nova.request({
                 method: 'get',
-                url: '/nova-vendor/nova-dashboard/widget/view',
-                cancelToken: currentToken.token,
+                url: `/nova-vendor/nova-dashboard/${ this.dashboardKey }`,
                 params: {
                     editMode: 'create',
-                    editing: true,
-                    dashboard: this.dashboardKey,
-                    view: viewKey
+                    editing: true
                 }
+            })).then(response => {
+
+                this.responseData = response.data
+
+                /**
+                 * Initialize Vuex
+                 */
+                this.$store.registerModule(this.dashboardKey, resource)
+                this.loading = false
+                this.openFilterView = this.options.expandFilterByDefault
+
+                if (!this.selectedViewKey && this.responseData.activeViewData) {
+
+                    this.selectedViewKey = this.responseData.activeViewData.uriKey
+                    this.selectedViewData = this.responseData.activeViewData.data
+
+                }
+
             }).catch(error => {
 
-                Nova.error(this.__('There was a problem fetching your view data.'))
+                if (error.response.status === 404) {
 
-            }).then(response => {
+                    this.$router.push({ name: '404' })
 
-                this.selectedViewData = response.data
-                this.selectedViewKey = viewKey
-                this.cancelToken = null
+                } else {
 
-            })
+                    Nova.error(error.response.data.message)
 
-        },
-        initialize() {
-
-            for (const state of this.selectedViewData) {
-
-                this.appendWidget(state)
-
-            }
-
-        },
-        findWidgetByKey(key) {
-
-            return this.responseData.widgets.find(widget => widget.key === key)
-
-        },
-        editOption(widget) {
-
-            if (widget.editable) {
-
-                this.selectedWidgetForEditing = widget
-                this.closeWidgetEditModal = false
-
-            }
-
-        },
-        filterChanged() {
-
-            this.debouncer(() => {
-                Nova.$emit('NovaFilterUpdate', this.$store.getters[ `${ this.dashboardKey }/currentEncodedFilters` ])
-            })
-
-        },
-        updateCoordinates(widget) {
-
-            Nova.request({
-                method: 'post',
-                url: '/nova-vendor/nova-dashboard/widget/update-coordinates',
-                data: {
-                    id: widget.id,
-                    dashboard: this.dashboardKey,
-                    view: widget.viewKey,
-                    widget: widget.widgetKey,
-                    coordinates: widget.coordinates
                 }
-            }).catch(error => {
-
-                Nova.error(this.__('There was a problem saving your latest changes.'))
-
-            }).then(response => {
-
-                Nova.$emit(`widget-${ widget.id }-update-coordinates`, widget)
 
             })
 
         },
-        async widgetWasUpdated(updatedWidgetId) {
+        watch: {
+            selectedViewKey() {
 
-            this.closeEditWidgetModal()
+                this.$store.commit(`${ this.dashboardKey }/storeFilters`, this.filters)
+                this.activeWidgets = []
 
+                /**
+                 * Give some time for the transition to finish
+                 */
+                setTimeout(() => this.initialize(), 250)
+
+            }
         },
-        closeEditWidgetModal() {
+        computed: {
+            allowWidgetEditing() {
 
-            this.selectedWidgetForEditing = null
+                return this.activeView.meta[ 'editable' ] ?? false
 
+            },
+            shouldExpandFilterView() {
+
+                if (this.filters.length === 0) {
+
+                    return false
+
+                }
+
+                return this.openFilterView
+
+            },
+            activeView() {
+
+                return this.responseData.views.find(view => view.uriKey === this.selectedViewKey)
+
+            },
+            actions() {
+
+                if (this.activeView) {
+
+                    return this.activeView.actions
+
+                }
+
+                return this.responseData.actions
+
+            },
+            filters() {
+
+                if (this.activeView) {
+
+                    return this.activeView.filters
+
+                }
+
+                return this.responseData.filters
+
+            },
+            views() {
+                return this.responseData.views
+            },
+            schemas() {
+
+                if (this.activeView) {
+
+                    return this.activeView.schemas
+
+                }
+
+                return {}
+
+            },
+            options() {
+                return _.merge({
+                    enableAddWidgetButton: true,
+                    enableWidgetEditing: true,
+                    expandFilterByDefault: true,
+                    grid: {
+                        useCssTransforms: false,
+                        breakpoint: 'none',
+                        numberOfCols: 6,
+                        compact: false,
+                        breakpointWidth: Infinity,
+                        rowHeight: 150
+                    }
+                }, this.responseData.options)
+            }
         },
-        resetModal() {
+        methods: {
+            debouncer: _.debounce(callback => callback(), 100),
+            onViewSelected(viewKey) {
 
-            this.closeWidgetCreationModal = true
-            this.selectedWidgetForEditing = null
+                if (this.cancelToken) {
 
-        },
-        async widgetWasDeleted(deletedId) {
+                    this.cancelToken.cancel('Operation canceled by the user.')
 
-            this.closeEditWidgetModal()
+                }
 
-            const widgetIndex = this.activeWidgets.findIndex(({ id }) => id === deletedId)
+                const currentToken = this.cancelToken = axios.CancelToken.source()
 
-            this.activeWidgets.splice(widgetIndex, 1)
+                Nova.request({
+                    method: 'get',
+                    url: '/nova-vendor/nova-dashboard/widget/view',
+                    cancelToken: currentToken.token,
+                    params: {
+                        editMode: 'create',
+                        editing: true,
+                        dashboard: this.dashboardKey,
+                        view: viewKey
+                    }
+                }).catch(error => {
 
-            Nova.$emit(`widget-${ deletedId }-deleted`)
+                    Nova.error(this.__('There was a problem fetching your view data.'))
 
-        },
-        appendNewWidget(widgetData) {
+                }).then(response => {
 
-            this.activeWidgets.push(widgetData)
+                    this.selectedViewData = response.data
+                    this.selectedViewKey = viewKey
+                    this.cancelToken = null
 
-        },
-        appendWidget({ data: { coordinates, id, options, ...meta }, uriKey, editable }) {
+                })
 
-            this.activeWidgets.push({
-                id,
-                editable,
-                meta,
-                schema: this.schemas[ uriKey ],
-                options: options,
-                coordinates: coordinates || { x: 0, y: 0, width: 2, height: 1 },
-                dashboardKey: this.dashboardKey,
-                viewKey: this.selectedViewKey,
-                widgetKey: uriKey
-            })
+            },
+            initialize() {
 
-        },
-        async addWidget({ uriKey, component }, options) {
+                for (const state of this.selectedViewData) {
 
-            this.$nextTick(() => this.resetModal())
+                    this.appendWidget(state)
 
-            this.activeWidgets.push({
-                id: Date.now() * Math.random(),
-                component: component,
-                coordinates: { x: 0, y: 0, width: 2, height: 1 },
-                widgetKey: uriKey,
-                dashboardKey: this.dashboardKey,
-                viewKey: this.selectedViewKey,
-                options: options
-            })
+                }
+
+            },
+            findWidgetByKey(key) {
+
+                return this.responseData.widgets.find(widget => widget.key === key)
+
+            },
+            editOption(widget) {
+
+                if (widget.editable) {
+
+                    this.selectedWidgetForEditing = widget
+                    this.closeWidgetEditModal = false
+
+                }
+
+            },
+            filterChanged() {
+
+                this.debouncer(() => {
+                    Nova.$emit('NovaFilterUpdate', this.$store.getters[ `${ this.dashboardKey }/currentEncodedFilters` ])
+                })
+
+            },
+            updateCoordinates(widget) {
+
+                Nova.request({
+                    method: 'post',
+                    url: '/nova-vendor/nova-dashboard/widget/update-coordinates',
+                    data: {
+                        id: widget.id,
+                        dashboard: this.dashboardKey,
+                        view: widget.viewKey,
+                        widget: widget.widgetKey,
+                        coordinates: widget.coordinates
+                    }
+                }).catch(error => {
+
+                    Nova.error(this.__('There was a problem saving your latest changes.'))
+
+                }).then(response => {
+
+                    Nova.$emit(`widget-${ widget.id }-update-coordinates`, widget)
+
+                })
+
+            },
+            async widgetWasUpdated(updatedWidgetId) {
+
+                this.closeEditWidgetModal()
+
+            },
+            closeEditWidgetModal() {
+
+                this.selectedWidgetForEditing = null
+
+            },
+            resetModal() {
+
+                this.closeWidgetCreationModal = true
+                this.selectedWidgetForEditing = null
+
+            },
+            async widgetWasDeleted(deletedId) {
+
+                this.closeEditWidgetModal()
+
+                const widgetIndex = this.activeWidgets.findIndex(({ id }) => id === deletedId)
+
+                this.activeWidgets.splice(widgetIndex, 1)
+
+                Nova.$emit(`widget-${ deletedId }-deleted`)
+
+            },
+            appendNewWidget(widgetData) {
+
+                this.activeWidgets.push(widgetData)
+
+            },
+            appendWidget({ data: { coordinates, id, options, ...meta }, uriKey, editable }) {
+
+                this.activeWidgets.push({
+                    id,
+                    editable,
+                    meta,
+                    schema: this.schemas[ uriKey ],
+                    options: options,
+                    coordinates: coordinates || { x: 0, y: 0, width: 2, height: 1 },
+                    dashboardKey: this.dashboardKey,
+                    viewKey: this.selectedViewKey,
+                    widgetKey: uriKey
+                })
+
+            },
+            async addWidget({ uriKey, component }, options) {
+
+                this.$nextTick(() => this.resetModal())
+
+                this.activeWidgets.push({
+                    id: Date.now() * Math.random(),
+                    component: component,
+                    coordinates: { x: 0, y: 0, width: 2, height: 1 },
+                    widgetKey: uriKey,
+                    dashboardKey: this.dashboardKey,
+                    viewKey: this.selectedViewKey,
+                    options: options
+                })
+
+            }
 
         }
 
     }
-
-}
 
 </script>
 
 <style lang="scss">
 
-.nova-bi {
-    width: 100%;
-    height: 100%;
-    display: block;
-}
+    .nova-bi {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
 
-.nova-bi__menu {
+    .nova-bi__menu {
 
-    transition: border-radius 50ms 200ms, padding 250ms;
+        transition: border-radius 50ms 200ms, padding 250ms;
 
-    &.rounded-b-none {
+        &.rounded-b-none {
 
-        transition: border-radius 0ms 0ms, padding 250ms;
+            transition: border-radius 0ms 0ms, padding 250ms;
+
+        }
 
     }
 
-}
+    .nova-bi__filter-container > .nova-bi__filter:last-child {
 
-.nova-bi__filter-container > .nova-bi__filter:last-child {
+        padding-bottom: 1.5rem;
 
-    padding-bottom: 1.5rem;
+    }
 
-}
-
-.nova-bi__filter {
-    padding-top: 1rem;
-    padding-left: 2rem;
-    padding-right: 2rem;
-}
+    .nova-bi__filter {
+        padding-top: 1rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
 
 </style>
 
