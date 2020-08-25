@@ -74,7 +74,13 @@ class NovaDashboard extends Tool
 
             if ($dashboard->uriKey() === $dashboardKey) {
 
-                return new $dashboard();
+                if (is_string($dashboard) && class_exists($dashboard)) {
+
+                    return new $dashboard();
+
+                }
+
+                return $dashboard;
 
             }
 
@@ -84,7 +90,7 @@ class NovaDashboard extends Tool
 
     }
 
-    private function resolveDashboards(): Collection
+    protected function resolveDashboards(): Collection
     {
         return once(function () {
             return collect($this->dashboards)
