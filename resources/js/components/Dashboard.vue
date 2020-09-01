@@ -1,12 +1,12 @@
 <template>
 
-    <loading-card :loading="loading" class="nova-bi bg-transparent shadow-none">
+    <loading-card :loading="loading" class="nova-dashboard bg-transparent shadow-none">
 
         <div v-if="loading" style="height: 300px"/>
 
         <div v-else :key="selectedViewKey">
 
-            <card class="flex p-4 justify-between nova-bi__menu"
+            <card class="flex p-4 justify-between nova-dashboard__menu"
                   :class="{ 'rounded-b-none p-8': shouldExpandFilterView }">
 
                 <div class="flex flex-col justify-center px-2">
@@ -83,9 +83,9 @@
             <CollapseTransition :duration="250">
 
                 <card v-if="shouldExpandFilterView"
-                      class="nova-bi__filter-container flex flex-wrap rounded-t-none border-t border-40 bg-30">
+                      class="nova-dashboard__filter-container flex flex-wrap rounded-t-none border-t border-40 bg-30">
 
-                    <component class="nova-bi__filter flex flex-col inline-flex w-1/2"
+                    <component class="nova-dashboard__filter flex flex-col inline-flex w-1/2"
                                v-for="filter in filters"
                                :key="filter.name"
                                :resource-name="dashboardKey"
@@ -468,13 +468,13 @@
 
 <style lang="scss">
 
-    .nova-bi {
+    .nova-dashboard {
         width: 100%;
         height: 100%;
         display: block;
     }
 
-    .nova-bi__menu {
+    .nova-dashboard__menu {
 
         transition: border-radius 50ms 200ms, padding 250ms;
 
@@ -486,13 +486,13 @@
 
     }
 
-    .nova-bi__filter-container > .nova-bi__filter:last-child {
+    .nova-dashboard__filter-container > .nova-dashboard__filter:last-child {
 
         padding-bottom: 1.5rem;
 
     }
 
-    .nova-bi__filter {
+    .nova-dashboard__filter {
         padding-top: 1rem;
         padding-left: 2rem;
         padding-right: 2rem;
