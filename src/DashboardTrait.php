@@ -25,7 +25,7 @@ trait DashboardTrait
      *
      * @return string
      */
-    public static function label(): string
+    public function label(): string
     {
         return static::humanize(class_basename(static::class));
     }
@@ -35,12 +35,12 @@ trait DashboardTrait
      *
      * @return string
      */
-    public static function uriKey(): string
+    public function uriKey(): string
     {
         return Str::kebab(class_basename(static::class));
     }
 
-    public static function title(): string
+    public function title(): string
     {
         return static::$title ?? static::humanize(class_basename(static::class));
     }
