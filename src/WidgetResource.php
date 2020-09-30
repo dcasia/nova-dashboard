@@ -37,7 +37,7 @@ class WidgetResource extends AbstractResource
             'router' => [
                 'name' => 'nova-dashboard',
                 'params' => [
-                    'dashboardKey' => $this->resource::uriKey(),
+                    'dashboardKey' => resolve($this->resource)->uriKey(),
                 ],
             ],
         ];
