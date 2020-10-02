@@ -97,6 +97,23 @@ Required an array of views.
 | expandFilterByDefault | bool  | whether the filters should default to be expanded or collapsed by default                           |
 | grid                  | array | See a full list of all available options here: https://vue-responsive-dash.netlify.app/api/#props-2 |
 
+
+#### Hide dashboard from side menu
+
+You can hide a dashboard, without losing functionlity (t's still accessible through apis or if you open it directly if you know the URL) using
+
+```php
+    NovaDashboard::make([...])->withoutNavigationMenu()
+```
+
+> Note: If you use CollapsibleResourceManager, you can link direcly to a dashboard by calling:
+
+```php
+use DigitalCreative\NovaDashboard\WidgetResource
+
+    WidgetResource::make(MainDashboard::class)->label('Main Dashboard')),
+```
+
 # Views
 
 There are 3 components that can be set within views (Widgets, Actions, Filters)
