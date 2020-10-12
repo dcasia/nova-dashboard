@@ -6,7 +6,7 @@
 
 ![Laravel Nova Dashboard In Action](https://raw.githubusercontent.com/dcasia/nova-dashboard/master/screenshots/demo.gif)
 
-The missing dashboard for Laravel Nova!
+The missing dashboard for Laravel Nova! Easy to manage with [Nova Dashboard Manager](https://novapackages.com/packages/nova-bi/nova-dashboard-manager).
 
 # Installation
 
@@ -30,6 +30,9 @@ Run Migrations
 
 ## Usage
 
+
+### Option 1: Code your Dashboards
+
 Register the `NovaDashboard` tool within your `NovaServiceProvider.php`
 
 ```php
@@ -50,6 +53,11 @@ public function tools()
 > - digital-creative/value-widget 
 > - digital-creative/nova-range-input-filter 
 > - digital-creative/nova-pill-filter
+
+
+### Option 2: Manage your Dashboards
+
+In alternative you can use the [Nova Dashboard Manager](https://novapackages.com/packages/nova-bi/nova-dashboard-manager) which provides a ready to use User Interface to adminstrate dashboards. The packages has ready-to-use examples and guides how to implement your own metric-Widgets.
 
 # Dashboard
 
