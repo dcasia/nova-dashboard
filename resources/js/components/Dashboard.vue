@@ -489,12 +489,6 @@
 
                 download(canvas.toDataURL(), 'dashboard.png', 'image/png')
 
-                // const output = await this.$html2canvas(
-                //     this.$refs.canvas, { type: 'dataURL' }
-                // )
-                //
-                // require('downloadjs')(output, 'dashboard.png', 'image/png')
-
             }
 
         }
