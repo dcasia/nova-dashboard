@@ -31,7 +31,7 @@
                                 @click="screenshot">
 
                             <div class="h-dropdown-trigger text-white font-bold flex items-center cursor-pointer select-none px-3 border-2 border-30 rounded bg-primary border-primary">
-                                {{ __('Save as image')}}1232
+                                {{ __('Save as image')}}
                             </div>
 
                         </button>
