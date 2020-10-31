@@ -1,5 +1,7 @@
 import Dashboard from './components/Dashboard'
 import Widget from './components/Widget'
+import VueHtml2Canvas from 'vue-html2canvas';
+
 
 Nova.booting((Vue, router, store) => {
 
@@ -12,6 +14,6 @@ Nova.booting((Vue, router, store) => {
     ])
 
     Vue.component('widget', Widget)
-
+    Vue.use(VueHtml2Canvas);
 })
 
