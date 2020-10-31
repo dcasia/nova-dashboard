@@ -13,6 +13,8 @@
         "@babel/runtime": "^7.12.1",
         "cross-env": "^7.0.2",
         "dot-object": "^2.1.4",
+        "downloadjs": "^1.4.7",
+        "html2canvas": "^1.0.0-rc.7",
         "laravel-mix": "^5.0.7",
         "laravel-nova": "^1.6.0",
         "lodash": "^4.17.20",
@@ -22,9 +24,5 @@
         "vue-responsive-dash": "^0.4.3",
         "vue-template-compiler": "^2.6.12",
         "vue2-transitions": "^0.3.0"
-    },
-    "dependencies": {
-        "downloadjs": "^1.4.7",
-        "vue-html2canvas": "0.0.4"
     }
 }
