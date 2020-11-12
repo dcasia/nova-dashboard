@@ -10,9 +10,11 @@
                       @moveEnd="$emit('moved', widget)"
                       @resizeEnd="$emit('moved', widget)"
                       :id="widget.id"
-                      :min-width="1"
-                      :draggable="widget.editable && allowEdit"
-                      :resizable="widget.editable && allowEdit"
+                      :draggable="widget.draggable && allowEdit"
+                      :resizable="widget.resizable && allowEdit"
+                      :min-width="widget.minWidth"
+                      :min-height="widget.minHeight"
+                      :locked="widget.locked"
                       :resize-handle-size="0">
 
                 <component :is="widget.schema.component"
@@ -58,7 +60,7 @@
 
                 </div>
 
-                <template v-if="widget.editable && allowEdit" v-slot:resizeBottomRight>
+                <template v-if="widget.resizable || allowEdit" v-slot:resizeBottomRight>
                     <div class="grid__resize-handler"/>
                 </template>
 
