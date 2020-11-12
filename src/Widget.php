@@ -287,6 +287,13 @@ abstract class Widget implements JsonSerializable
         return [
             'uriKey' => $this->uriKey(),
             'editable' => blank($this->preset),
+
+            'draggable' => $this->meta['options']['draggable'] ?? blank($this->preset),
+            'resizable' => $this->meta['options']['resizable'] ?? blank($this->preset),
+            'locked' => $this->meta['options']['locked'] ?? false,
+            'minWidth' => !empty($this->meta['options']['minWidth']) ? intval($this->meta['options']['minWidth']) : 1,
+            'minHeight' => !empty($this->meta['options']['minHeight']) ? intval($this->meta['options']['minHeight']) : 1,
+
             'data' => $this->meta(),
         ];
     }
