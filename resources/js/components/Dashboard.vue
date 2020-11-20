@@ -453,7 +453,7 @@
                 this.activeWidgets.push(widgetData)
 
             },
-            appendWidget({data: {coordinates, id, options, ...meta}, uriKey, editable, draggable, resizable, locked, minWidth, minHeight}) {
+            appendWidget({ data: { coordinates, id, options, ...meta }, uriKey, editable, draggable, resizable, locked, minWidth, minHeight }) {
 
                 this.activeWidgets.push({
                     id,
@@ -464,9 +464,9 @@
                     minWidth,
                     minHeight,
                     meta,
-                    schema: this.schemas[uriKey],
+                    schema: this.schemas[ uriKey ],
                     options: options,
-                    coordinates: coordinates || {x: 0, y: 0, width: 2, height: 1},
+                    coordinates: coordinates || { x: 0, y: 0, width: 2, height: 1 },
                     dashboardKey: this.dashboardKey,
                     viewKey: this.selectedViewKey,
                     widgetKey: uriKey
