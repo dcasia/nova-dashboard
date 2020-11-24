@@ -44,7 +44,7 @@
 
                     <FadeTransition>
 
-                        <button v-if="allowWidgetEditing"
+                        <button v-if="allowWidgetEditing && options.enableAddWidgetButton"
                                 role="button"
                                 class="rounded active:outline-none active:shadow-outline focus:outline-none focus:shadow-outline mr-2"
                                 @click="closeWidgetCreationModal = false">
