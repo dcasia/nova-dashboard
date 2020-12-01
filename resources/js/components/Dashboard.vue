@@ -399,7 +399,9 @@
 
             },
             updateCoordinates(widget) {
-                this.activeWidgets.map(function(value){
+
+                this.activeWidgets.map(value => {
+
                     Nova.request({
                         method: 'post',
                         url: '/nova-vendor/nova-dashboard/widget/update-coordinates',
@@ -419,7 +421,9 @@
                         Nova.$emit(`widget-${ widget.id }-update-coordinates`, widget)
 
                     })
-                });
+
+                })
+
             },
             async widgetWasUpdated(updatedWidgetId) {
 
