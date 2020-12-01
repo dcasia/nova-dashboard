@@ -184,13 +184,10 @@
         },
         data() {
 
-            const dashboardKey = this.$route.params.dashboardKey
-
             return {
                 selectedViewKey: null,
                 selectedViewData: [],
                 loading: true,
-                dashboardKey,
                 cancelToken: null,
                 responseData: null,
                 openFilterView: true,
@@ -203,61 +200,35 @@
 
         },
         mounted() {
-
-            Minimum(Nova.request({
-                method: 'get',
-                url: `/nova-vendor/nova-dashboard/${ this.dashboardKey }`,
-                params: {
-                    editMode: 'create',
-                    editing: true
-                }
-            })).then(response => {
-
-                this.responseData = response.data
-
-                /**
-                 * Initialize Vuex
-                 */
-                this.$store.registerModule(this.dashboardKey, resource)
-                this.loading = false
-                this.openFilterView = this.options.expandFilterByDefault
-
-                if (!this.selectedViewKey && this.responseData.activeViewData) {
-
-                    this.selectedViewKey = this.responseData.activeViewData.uriKey
-                    this.selectedViewData = this.responseData.activeViewData.data
-
-                }
-
-            }).catch(error => {
-
-                if (error.response.status === 404) {
-
-                    this.$router.push({ name: '404' })
-
-                } else {
-
-                    Nova.error(error.response.data.message)
-
-                }
-
-            })
-
+            this.fetchWidgetData()
         },
         watch: {
-            selectedViewKey() {
+            dashboardKey(current, oldValue) {
+                this.reset(oldValue)
+                this.fetchWidgetData()
+            },
+            selectedViewKey(value) {
 
-                this.$store.commit(`${ this.dashboardKey }/storeFilters`, this.filters)
-                this.activeWidgets = []
+                if (value) {
 
-                /**
-                 * Give some time for the transition to finish
-                 */
-                setTimeout(() => this.initialize(), 250)
+                    this.$store.commit(`${ this.dashboardKey }/storeFilters`, this.filters)
+                    this.activeWidgets = []
+
+                    /**
+                     * Give some time for the transition to finish
+                     */
+                    setTimeout(() => this.initialize(), 250)
+
+                }
 
             }
         },
         computed: {
+            dashboardKey() {
+
+                return this.$route.params.dashboardKey
+
+            },
             allowWidgetEditing() {
 
                 return this.activeView.meta[ 'editable' ] ?? false
@@ -276,7 +247,7 @@
             },
             activeView() {
 
-                return this.responseData.views.find(view => view.uriKey === this.selectedViewKey)
+                return this.views.find(view => view.uriKey === this.selectedViewKey)
 
             },
             actions() {
@@ -292,13 +263,7 @@
             },
             filters() {
 
-                if (this.activeView) {
-
-                    return this.activeView.filters
-
-                }
-
-                return this.responseData.filters
+                return this.activeView.filters
 
             },
             views() {
@@ -334,6 +299,59 @@
         },
         methods: {
             debouncer: _.debounce(callback => callback(), 100),
+            reset(dashboardKey) {
+
+                this.loading = true
+                this.$store.unregisterModule(dashboardKey, resource)
+                this.selectedViewKey = null
+                this.selectedViewData = null
+                this.responseData = null
+                this.selectedWidgetForEditing = null
+                this.activeWidgets = []
+
+            },
+            fetchWidgetData() {
+
+                Minimum(Nova.request({
+                    method: 'get',
+                    url: `/nova-vendor/nova-dashboard/${ this.dashboardKey }`,
+                    params: {
+                        editMode: 'create',
+                        editing: true
+                    }
+                })).then(response => {
+
+                    this.responseData = response.data
+
+                    this.$nextTick(() => {
+
+                        /**
+                         * Initialize Vuex
+                         */
+                        this.$store.registerModule(this.dashboardKey, resource)
+                        this.loading = false
+                        this.openFilterView = this.options.expandFilterByDefault
+
+                        this.selectedViewKey = this.responseData.activeViewData.uriKey
+                        this.selectedViewData = this.responseData.activeViewData.data
+
+                    })
+
+                }).catch(error => {
+
+                    if (error.response.status === 404) {
+
+                        this.$router.push({ name: '404' })
+
+                    } else {
+
+                        Nova.error(error.response.data.message)
+
+                    }
+
+                })
+
+            },
             onViewSelected(viewKey) {
 
                 if (this.cancelToken) {
