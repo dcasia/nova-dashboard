@@ -6,7 +6,7 @@
 
         <div v-else :key="selectedViewKey">
 
-            <card class="flex p-4 justify-between nova-dashboard__menu"
+            <card class="flex flex-col md-col-row p-4 justify-between nova-dashboard__menu"
                   :class="{ 'rounded-b-none p-8': shouldExpandFilterView }">
 
                 <div class="flex flex-col justify-center px-2">
@@ -22,7 +22,7 @@
 
                 </div>
 
-                <div class="flex items-center">
+                <div class="flex items-center mt-4">
 
                     <FadeTransition>
 
@@ -555,6 +555,10 @@
         padding-left: 2rem;
         padding-right: 2rem;
     }
-
+    
+    @media (min-width: 768px) {
+        .col-row {
+            flex-direction: row;
+        }
+    }
 </style>
-
