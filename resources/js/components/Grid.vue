@@ -2,7 +2,11 @@
 
     <Dashboard class="grid" id="nova-dashboard">
 
-        <DashLayout v-bind="options">
+        <DashLayout
+            v-for="layout in options"
+            v-bind="layout"
+            :key="layout.breakpoint"
+        >
 
             <DashItem class="grid__item"
                       v-for="widget of widgets" :key="widget.id"
