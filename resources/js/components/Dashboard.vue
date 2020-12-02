@@ -119,7 +119,7 @@
             </CollapseTransition>
 
             <grid ref="canvas"
-                  class="grid-stack flex-1 -mx-2 mt-8"
+                  class="grid-stack flex-1 -mx-2 mt-3"
                   :options="options.grid"
                   :widgets="activeWidgets"
                   :allow-edit="allowWidgetEditing"
