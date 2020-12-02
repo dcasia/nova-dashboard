@@ -18,6 +18,8 @@
                       :resizable="widget.resizable && allowEdit"
                       :min-width="widget.minWidth"
                       :min-height="widget.minHeight"
+                      :max-width="widget.maxWidth"
+                      :max-height="widget.maxHeight"
                       :locked="widget.locked"
                       :resize-handle-size="0">
 
