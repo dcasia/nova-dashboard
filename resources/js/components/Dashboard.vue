@@ -581,7 +581,7 @@
     }
     
     @media (min-width: 768px) {
-        .col-row {
+        .md-col-row {
             flex-direction: row;
         }
     }
