@@ -286,14 +286,14 @@
                     enableWidgetEditing: true,
                     expandFilterByDefault: true,
                     displayScreenshotButton: false,
-                    grid: {
+                    grid: [{
                         useCssTransforms: false,
                         breakpoint: 'none',
                         numberOfCols: 6,
                         compact: false,
                         breakpointWidth: Infinity,
                         rowHeight: 150
-                    }
+                    }]
                 }, this.responseData.options)
             }
         },
