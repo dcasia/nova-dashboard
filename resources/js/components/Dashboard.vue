@@ -520,7 +520,13 @@
 
                 const canvas = await html2canvas(this.$refs.canvas.$el)
 
+                canvasEl.classList.add('screenshotState')
+
+                const canvas = await html2canvas(canvasEl)
+
                 download(canvas.toDataURL(), 'dashboard.png', 'image/png')
+
+                canvasEl.classList.remove('screenshotState')
 
             }
 
@@ -536,6 +542,18 @@
         width: 100%;
         height: 100%;
         display: block;
+        
+        .screenshotState {
+            .pin-r, .resize {
+                visibility: hidden;
+            }
+            .grid__item {
+                border: 1px solid #888;
+                .card {
+                    border-radius: 0;
+                }
+            }
+        }
     }
 
     .nova-dashboard__menu {
