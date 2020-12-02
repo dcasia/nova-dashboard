@@ -15,10 +15,16 @@
                         {{ responseData.title }}
                     </p>
 
-                    <view-select @change="onViewSelected"
+                    <view-select v-if="responseData.views.length > 1"
+                                 @change="onViewSelected"
                                  :selected-view="selectedViewKey"
                                  :views="responseData.views"
                                  class="mr-2"/>
+                    <div v-else>
+                        <div class="flex items-center text-90 font-normal text-2xl">
+                            {{ activeView.title }}
+                        </div>
+                    </div>
 
                 </div>
 
