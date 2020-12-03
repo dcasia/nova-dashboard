@@ -292,8 +292,8 @@ abstract class Widget implements JsonSerializable
             'locked' => $this->meta[ 'options' ][ 'locked' ] ?? false,
             'minWidth' => !empty($this->meta[ 'options' ][ 'minWidth' ]) ? (int) $this->meta[ 'options' ][ 'minWidth' ] : 1,
             'minHeight' => !empty($this->meta[ 'options' ][ 'minHeight' ]) ? (int) $this->meta[ 'options' ][ 'minHeight' ] : 1,
-            'maxWidth' => !empty($this->meta[ 'options' ][ 'maxWidth' ]) ? (int) $this->meta[ 'options' ][ 'maxWidth' ] : 1,
-            'maxHeight' => !empty($this->meta[ 'options' ][ 'maxHeight' ]) ? (int) $this->meta[ 'options' ][ 'maxHeight' ] : 1,
+            'maxWidth' => !empty($this->meta[ 'options' ][ 'maxWidth' ]) ? (int) $this->meta[ 'options' ][ 'maxWidth' ] : null,
+            'maxHeight' => !empty($this->meta[ 'options' ][ 'maxHeight' ]) ? (int) $this->meta[ 'options' ][ 'maxHeight' ] : null,
             'data' => $this->meta(),
         ];
     }
