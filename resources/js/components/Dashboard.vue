@@ -520,7 +520,7 @@
             },
             async screenshot() {
 
-                const canvas = await html2canvas(this.$refs.canvas.$el)
+                const canvasEl = this.$refs.canvas.$el;
 
                 canvasEl.classList.add('screenshotState')
 
