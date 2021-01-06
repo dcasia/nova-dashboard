@@ -1,19 +1,19 @@
 <template>
 
-    <loading-card :loading="loading"
+    <loading-card-overlay :loading="loading"
                   class="flex flex-col w-full rounded justify-between"
                   :class="{ 'px-6 py-4': !noPadding }">
 
         <FadeTransition>
 
-            <slot v-if="loading === false"
+            <slot v-if="loading === false || preloaded"
                   :options="options"
                   :value="value"
-                  :namespace="namespace"/>
+                  :namespace="namespace" />
 
         </FadeTransition>
 
-    </loading-card>
+    </loading-card-overlay>
 
 </template>
 
@@ -33,7 +33,8 @@ export default {
     },
     data() {
         return {
-            loading: true
+            loading: true,
+            preloaded: false
         }
     },
     computed: {
@@ -101,6 +102,8 @@ export default {
                 this.$store.commit(`${ this.namespace }/updateWidgetData`, response.data)
 
                 this.$nextTick(() => this.loading = false)
+                
+                this.$nextTick(() => this.preloaded = true)
 
             }).catch(error => {
 
