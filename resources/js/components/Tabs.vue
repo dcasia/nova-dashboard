@@ -27,29 +27,29 @@
 
 <script>
 
-export default {
-    name: 'Tabs',
-    props: {
-        headers: { type: Array, required: true }
-    },
-    data() {
+    export default {
+        name: 'Tabs',
+        props: {
+            headers: { type: Array, required: true }
+        },
+        data() {
 
-        return {
-            activeTab: this.headers[ 0 ].key
-        }
-
-    },
-    methods: {
-        setActiveTab(key) {
-
-            if (key !== this.activeTab) {
-
-                this.activeTab = key
-
+            return {
+                activeTab: this.headers[ 0 ].key
             }
 
+        },
+        methods: {
+            setActiveTab(key) {
+
+                if (key !== this.activeTab) {
+
+                    this.activeTab = key
+
+                }
+
+            }
         }
     }
-}
 
 </script>

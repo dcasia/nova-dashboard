@@ -1,7 +1,9 @@
 const mix = require('laravel-mix')
+const path = require('path')
 
 mix.setPublicPath('dist')
    .js('resources/js/tool.js', 'js')
+   .vue()
    .webpackConfig(webpack => {
        return {
            resolve: {

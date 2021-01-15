@@ -1,38 +1,40 @@
 <template>
+
     <card class="relative">
-        <div
-            v-if="loading"
+
+        <div v-if="loading"
             class="rounded-lg flex items-center justify-center absolute pin z-50 opacity-50"
-            :class="modeClass"
-        >
-            <loader class="text-60" />
+            :class="modeClass">
+
+            <loader class="text-60"/>
+
         </div>
 
-        <slot />
+        <slot/>
+
     </card>
+
 </template>
 
 <script>
-export default {
-    props: {
-        loading: {
-            type: Boolean,
-            default: true,
+
+    export default {
+        props: {
+            loading: { type: Boolean, default: true },
+            mode: {
+                type: String,
+                default: 'light',
+                validator: function (value) {
+                    return [ 'light', 'dark' ].indexOf(value) !== -1
+                }
+            }
         },
 
-        mode: {
-            type: String,
-            default: 'light',
-            validator: function (value) {
-                return ['light', 'dark'].indexOf(value) !== -1
-            },
-        },
-    },
+        computed: {
+            modeClass() {
+                return this.mode == 'light' ? 'bg-white' : 'bg-90'
+            }
+        }
+    }
 
-    computed: {
-        modeClass() {
-            return this.mode == 'light' ? 'bg-white' : 'bg-90'
-        },
-    },
-}
 </script>

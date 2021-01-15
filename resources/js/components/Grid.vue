@@ -2,11 +2,7 @@
 
     <Dashboard class="grid" id="nova-dashboard">
 
-        <DashLayout
-            v-for="layout in options"
-            v-bind="layout"
-            :key="layout.breakpoint"
-        >
+        <DashLayout v-for="layout in options" v-bind="layout" :key="layout.breakpoint">
 
             <DashItem class="grid__item"
                       v-for="widget of widgets" :key="widget.id"
@@ -58,9 +54,7 @@
                               width="16"
                               class="cursor-pointer text-60 -mb-1"/>
 
-                        <tooltip-content slot="content"
-                                         v-html="widget.options.widget_help"
-                                         :max-width="200"/>
+                        <tooltip-content slot="content" v-html="widget.options.widget_help" :max-width="200"/>
 
                     </tooltip>
 
@@ -80,74 +74,74 @@
 
 <script>
 
-import { Dashboard, DashItem, DashLayout } from 'vue-responsive-dash'
+    import { Dashboard, DashItem, DashLayout } from 'vue-responsive-dash'
 
-export default {
-    name: 'Grid',
-    props: [ 'widgets', 'options', 'allowEdit' ],
-    components: {
-        Dashboard,
-        DashLayout,
-        DashItem
+    export default {
+        name: 'Grid',
+        props: [ 'widgets', 'options', 'allowEdit' ],
+        components: {
+            Dashboard,
+            DashLayout,
+            DashItem
+        }
     }
-}
 
 </script>
 
 <style lang="scss">
 
-.grid__content {
+    .grid__content {
 
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    border-radius: .5rem;
-    user-select: text;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        border-radius: .5rem;
+        user-select: text;
 
-}
-
-.grid__settings {
-
-    color: var(--60);
-
-}
-
-.grid__resize-handler {
-    border: 2px solid var(--60);
-    width: 1rem;
-    height: 1rem;
-    border-radius: .5rem;
-    display: table;
-    position: absolute;
-    right: -0.6rem;
-    bottom: -0.6rem;
-    background: var(--60);
-    transition: all 200ms;
-
-    &:hover {
-        border-radius: 0;
-        right: -0.4rem;
-        bottom: -0.4rem;
     }
 
-}
+    .grid__settings {
 
-div[id$="Placeholder"] .placeholder {
-    border-radius: .5rem;
-    background-color: var(--60)
-}
+        color: var(--60);
 
-div[id$="-resizeBottomRight"] {
+    }
 
-    width: 15px !important;
-    height: 15px !important;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    resize: none;
-    border-radius: .5rem;
+    .grid__resize-handler {
+        border: 2px solid var(--60);
+        width: 1rem;
+        height: 1rem;
+        border-radius: .5rem;
+        display: table;
+        position: absolute;
+        right: -0.6rem;
+        bottom: -0.6rem;
+        background: var(--60);
+        transition: all 200ms;
 
-}
+        &:hover {
+            border-radius: 0;
+            right: -0.4rem;
+            bottom: -0.4rem;
+        }
+
+    }
+
+    div[id$="Placeholder"] .placeholder {
+        border-radius: .5rem;
+        background-color: var(--60)
+    }
+
+    div[id$="-resizeBottomRight"] {
+
+        width: 15px !important;
+        height: 15px !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        resize: none;
+        border-radius: .5rem;
+
+    }
 
 </style>

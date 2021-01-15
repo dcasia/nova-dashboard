@@ -1,27 +1,27 @@
 {
     "private": true,
     "scripts": {
-        "dev": "npm run development",
-        "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-        "watch": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-        "watch-poll": "npm run watch -- --watch-poll",
-        "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
-        "prod": "npm run production",
-        "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+        "development": "mix",
+        "watch": "mix watch",
+        "watch-poll": "mix watch -- --watch-options-poll=1000",
+        "hot": "mix watch --hot",
+        "production": "mix --production"
     },
     "devDependencies": {
         "@babel/runtime": "^7.12.1",
-        "cross-env": "^7.0.2",
+        "cross-env": "^7.0.3",
         "dot-object": "^2.1.4",
         "downloadjs": "^1.4.7",
         "html2canvas": "^1.0.0-rc.7",
-        "laravel-mix": "^5.0.7",
-        "laravel-nova": "^1.6.0",
+        "laravel-mix": "^6.0.10",
+        "laravel-nova": "^1.7.0",
         "lodash": "^4.17.20",
-        "sass": "^1.28.0",
-        "sass-loader": "^9.0.3",
+        "postcss": "^8.2.4",
+        "sass": "^1.32.4",
+        "sass-loader": "^10.1.1",
         "vue": "^2.6.12",
-        "vue-responsive-dash": "^0.4.3",
+        "vue-loader": "^15.9.6",
+        "vue-responsive-dash": "^0.5.0",
         "vue-template-compiler": "^2.6.12",
         "vue2-transitions": "^0.3.0"
     }
