@@ -6,7 +6,7 @@
 
         <FadeTransition>
 
-            <slot v-if="loading === false || preloaded"
+            <slot v-if="loading === false"
                   :options="options"
                   :value="value"
                   :namespace="namespace"/>
