@@ -105,6 +105,34 @@ class WidgetController
 
     }
 
+    public function updateAllCoordinates(NovaRequest $request)
+    {
+        $widgetsData = request()->input('widgetsData');
+        foreach($widgetsData as $widget){
+            $dashboardKey = $widget['dashboard'];
+            $viewKey = $widget['view'];
+            $widgetKey = $widget['widget'];
+            $id = $widget['id'];
+            $coordinates = $widget['coordinates'];
+
+            /**
+             * Attempt to find the widget so authorization kicks in if user is unauthorized to interact with this resource
+             */
+            $this->findWidgetKey($request, $dashboardKey, $viewKey, $widgetKey);
+
+            /**
+             * @var WidgetModel $widgetInstance
+             */
+            $widgetInstance = $this->widgetModel()->newQuery()->whereKey($id)->firstOrFail();
+            $widgetInstance->setAttribute('coordinates', $coordinates);
+            $widgetInstance->save();
+        }
+
+        return response()->json([
+            'status' => 'success'
+        ]);
+    }
+
     public function createWidget(NovaRequest $request): JsonResponse
     {
 
