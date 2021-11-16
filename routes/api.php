@@ -22,4 +22,5 @@ Route::post('/widget/update', [ WidgetController::class, 'updateWidget' ]);
 Route::post('/widget/delete', [ WidgetController::class, 'deleteWidget' ]);
 Route::post('/widget/create', [ WidgetController::class, 'createWidget' ]);
 Route::post('/widget/update-coordinates', [ WidgetController::class, 'updateCoordinates' ]);
+Route::post('/widget/update-all-coordinates', [ WidgetController::class, 'updateAllCoordinates' ]);
 Route::get('/widget/view', [ WidgetController::class, 'getViewData' ]);
