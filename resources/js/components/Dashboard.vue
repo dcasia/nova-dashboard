@@ -423,31 +423,30 @@
 
             },
             updateCoordinates(widget) {
-
-                this.activeWidgets.map(value => {
-
-                    Nova.request({
-                        method: 'post',
-                        url: '/nova-vendor/nova-dashboard/widget/update-coordinates',
-                        data: {
+                var _this = this;
+                setTimeout(function(){
+                    let widgetsData = _this.activeWidgets.map(value => {
+                        return {
                             id: value.id,
                             dashboard: value.dashboardKey,
                             view: value.viewKey,
                             widget: value.widgetKey,
                             coordinates: value.coordinates
+                        };
+                    });
+
+                    Nova.request({
+                        method: 'post',
+                        url: '/nova-vendor/nova-dashboard/widget/update-all-coordinates',
+                        data: {
+                            widgetsData
                         }
                     }).catch(error => {
-
-                        Nova.error(this.__('There was a problem saving your latest changes.'))
-
+                        Nova.error(_this.__('There was a problem saving your latest changes.'))
                     }).then(response => {
-
                         Nova.$emit(`widget-${ widget.id }-update-coordinates`, widget)
-
                     })
-
-                })
-
+                }, 222);
             },
             async widgetWasUpdated(updatedWidgetId) {
 
