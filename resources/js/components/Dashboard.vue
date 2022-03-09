@@ -188,6 +188,17 @@
             ActionModal,
             ViewSelect
         },
+        metaInfo() {
+            if (this.responseData && this.responseData.title) {
+                return {
+                    title: this.responseData.title,
+                };
+            }
+
+            return {
+                title: 'Dashboard',
+            };
+        },
         data() {
 
             return {
@@ -292,14 +303,14 @@
                     enableWidgetEditing: true,
                     expandFilterByDefault: true,
                     displayScreenshotButton: false,
-                    grid: [ {
+                    grid: [{
                         useCssTransforms: false,
                         breakpoint: 'none',
                         numberOfCols: 6,
                         compact: false,
                         breakpointWidth: Infinity,
                         rowHeight: 150
-                    } ]
+                    }]
                 }, this.responseData.options)
             }
         },
@@ -481,18 +492,7 @@
                 this.activeWidgets.push(widgetData)
 
             },
-            appendWidget({
-                             data: { coordinates, id, options, ...meta },
-                             uriKey,
-                             editable,
-                             draggable,
-                             resizable,
-                             locked,
-                             minWidth,
-                             minHeight,
-                             maxWidth,
-                             maxHeight
-                         }) {
+            appendWidget({ data: { coordinates, id, options, ...meta }, uriKey, editable, draggable, resizable, locked, minWidth, minHeight, maxWidth, maxHeight }) {
 
                 this.activeWidgets.push({
                     id,
@@ -531,7 +531,7 @@
             },
             async screenshot() {
 
-                const canvasEl = this.$refs.canvas.$el
+                const canvasEl = this.$refs.canvas.$el;
 
                 canvasEl.classList.add('screenshotState')
 
@@ -560,10 +560,8 @@
             .pin-r, .resize {
                 visibility: hidden;
             }
-
             .grid__item {
                 border: 1px solid #888;
-
                 .card {
                     border-radius: 0;
                 }
