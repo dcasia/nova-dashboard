@@ -37,7 +37,7 @@ Register the `NovaDashboard` tool within your `NovaServiceProvider.php`
 
 ```php
 use DigitalCreative\NovaDashboard\Examples\ExampleDashboard;
-use DigitalCreative\NovaDashboard\NovaDashboard;
+use DigitalCreative\NovaDashboard\Card\NovaDashboard;
 
 public function tools()
 {
@@ -129,7 +129,7 @@ There are 3 components that can be set within views (Widgets, Actions, Filters)
 Example of a typical view class
 
 ```php
-use DigitalCreative\NovaDashboard\View;
+use DigitalCreative\NovaDashboard\Card\View;
 
 class MainView extends View
 {
