@@ -38,15 +38,15 @@ trait ResolveView
             ->firstWhere(fn (View $view) => !$viewKey || $view->key() === $viewKey);
     }
 
-    public function resolveWidget(string $key): ?Widget
+    public function findWidgetByKey(string $key): ?Widget
     {
         return $this
-            ->getWidgets()
+            ->widgets()
             ->firstWhere(fn (Widget $widget) => $widget->key() === $key);
     }
 
     public function resolveWidgetValue(NovaRequest $request, string $key): mixed
     {
-        return $this->resolveWidget($key)->resolveValue($request, $this);
+        return $this->findWidgetByKey($key)?->resolveValue($request, $this);
     }
 }

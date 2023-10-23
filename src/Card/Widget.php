@@ -26,7 +26,7 @@ abstract class Widget extends Card
         $view ??= View::findView($request, fn () => $this->caller);
 
         return $this->value(
-            Filters::fromRequest($request, $view->getFilters()),
+            Filters::fromRequest($request, $view->filters()),
         );
     }
 

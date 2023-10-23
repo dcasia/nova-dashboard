@@ -7,6 +7,7 @@ namespace DigitalCreative\NovaDashboard\Card;
 use DigitalCreative\NovaDashboard\Traits\ResolveView;
 use Illuminate\Support\Collection;
 use JsonSerializable;
+use Laravel\Nova\Filters\Filter;
 use Laravel\Nova\Makeable;
 use Laravel\Nova\Metable;
 
@@ -22,17 +23,36 @@ class View implements JsonSerializable
     {
     }
 
-    public function addWidget(Widget $widget): self
+    public function addWidget(Widget ...$widgets): self
     {
-        $widgets = data_get($this->meta, 'widgets', []);
-        $widgets[] = $widget;
+        $metaWidgets = data_get($this->meta, 'widgets', []);
 
-        return $this->withMeta([ 'widgets' => $widgets ]);
+        foreach ($widgets as $widget) {
+            $metaWidgets[] = $widget;
+        }
+
+        return $this->withMeta([ 'widgets' => $metaWidgets ]);
+    }
+
+    public function addWidgets(array $widgets): self
+    {
+        return $this->addWidget(...$widgets);
+    }
+
+    public function addFilter(Filter ...$filters): self
+    {
+        $metaFilters = data_get($this->meta, 'filters', []);
+
+        foreach ($filters as $filter) {
+            $metaFilters[] = $filter;
+        }
+
+        return $this->withMeta([ 'filters' => $metaFilters ]);
     }
 
     public function addFilters(array $filters): self
     {
-        return $this->withMeta([ 'filters' => $filters ]);
+        return $this->addFilter(...$filters);
     }
 
     public function icon(string $icon): self
@@ -45,14 +65,14 @@ class View implements JsonSerializable
         return md5($this->name);
     }
 
-    public function getFilters(): Collection
+    public function filters(): Collection
     {
-        return collect($this->meta[ 'filters' ] ?? []);
+        return collect(data_get($this->meta, 'filters', []));
     }
 
-    public function getWidgets(): Collection
+    public function widgets(): Collection
     {
-        return collect($this->meta[ 'widgets' ] ?? []);
+        return collect(data_get($this->meta, 'widgets', []));
     }
 
     public function jsonSerialize(): array
