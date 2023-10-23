@@ -47,12 +47,12 @@ class Filters
 
     public function applyToQueryBuilder(Builder $builder): Builder
     {
-        return tap($builder, function (Builder $builder): void {
+        $request = resolve(NovaRequest::class);
 
-            $this->filterDecoder->filters()->each(static function (ApplyFilter $applyFilter) use ($builder): void {
-                $applyFilter->filter->apply(resolve(NovaRequest::class), $builder, $applyFilter->value);
-            });
+        foreach ($this->filterDecoder->filters() as $filter) {
+            call_user_func($filter, $request, $builder);
+        }
 
-        });
+        return $builder;
     }
 }
