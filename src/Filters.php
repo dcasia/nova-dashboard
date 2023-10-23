@@ -1,79 +1,58 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace DigitalCreative\NovaDashboard;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Laravel\Nova\FilterDecoder;
-use Laravel\Nova\Filters\Filter;
+use Laravel\Nova\Filters\FilterDecoder;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Query\ApplyFilter;
 
-class Filters extends FilterDecoder
+class Filters
 {
-
-    private Collection $filters;
-
-    public static function fromUnencodedFilters(Collection $availableFilters): self
+    public function __construct(
+        private readonly FilterDecoder $filterDecoder,
+    )
     {
-
-        $result = $availableFilters
-            ->map(function (Filter $filter, string $filterClass) {
-                return [ 'class' => get_class($filter), 'value' => $filter->meta[ 'currentValue' ] ?? null ];
-            })
-            ->values();
-
-        return new self(base64_encode(json_encode($result, JSON_THROW_ON_ERROR)), $availableFilters);
-
     }
 
-    public function getFilterValue(string $filterClass, string $name = null)
+    public static function fromRequest(Request $request, Collection $filters): static
     {
+        $encodedFilters = $request->input(sprintf('%s_filter', $request->input('view')));
 
-        /**
-         * @var ApplyFilter|null $match
-         */
-        $match = $this->resolvedFilters()
-                      ->first(static function (ApplyFilter $value) use ($filterClass, $name) {
+        return new static(
+            new FilterDecoder($encodedFilters, $filters),
+        );
+    }
 
-                          $isInstanceOf = $value->filter instanceof $filterClass;
+    public function getFilterValue(string $filterClass, ?string $name = null): mixed
+    {
+        return $this->filterDecoder
+            ->filters()
+            ->firstWhere(function (ApplyFilter $filter) use ($filterClass, $name) {
 
-                          /**
-                           * If name is defined try to match the name as well
-                           */
-                          if ($name) {
+                $isInstanceOf = $filter->filter instanceof $filterClass;
 
-                              return $isInstanceOf && $value->filter->name() === $name;
+                if ($name) {
+                    return $isInstanceOf && $filter->filter->name() === $name;
+                }
 
-                          }
+                return $isInstanceOf;
 
-                          return $isInstanceOf;
-
-                      });
-
-        if ($match) {
-
-            return $match->value;
-
-        }
-
-        return null;
-
+            })?->value;
     }
 
     public function applyToQueryBuilder(Builder $builder): Builder
     {
-        return tap($builder, function (Builder $builder) {
-            $this->resolvedFilters()
-                 ->each(static function (ApplyFilter $applyFilter) use ($builder) {
-                     $applyFilter->filter->apply(resolve(NovaRequest::class), $builder, $applyFilter->value);
-                 });
-        });
-    }
+        $request = resolve(NovaRequest::class);
 
-    private function resolvedFilters(): Collection
-    {
-        return $this->filters ?? ($this->filters = $this->filters());
-    }
+        foreach ($this->filterDecoder->filters() as $filter) {
+            call_user_func($filter, $request, $builder);
+        }
 
+        return $builder;
+    }
 }
