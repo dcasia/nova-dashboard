@@ -170,6 +170,14 @@
                 expanded: false,
             }
         },
+        watch: {
+            activeView: {
+                immediate: true,
+                handler(view) {
+                    this.updateQueryString({ view: view.key })
+                },
+            },
+        },
         methods: {
             clearFilters() {
 
@@ -194,7 +202,6 @@
             },
             onViewToggle(view) {
 
-                this.updateQueryString({ view: view.key })
                 this.$emit('toggle', view)
                 this.$nextTick(() => this.initializeState())
 
