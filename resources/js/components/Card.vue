@@ -27,7 +27,6 @@
     import resourceStore from '@/store/resources'
 
     export default {
-        name: 'MegaFilterCard',
         components: { Filter },
         props: [
             'card',

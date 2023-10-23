@@ -143,7 +143,6 @@
     import { Collapse } from 'vue-collapsed'
 
     export default {
-        name: 'MegaFilter',
         components: { Collapse },
         mixins: [ Filterable, InteractsWithQueryString ],
         emits: [ 'filter-changed', 'toggle' ],
