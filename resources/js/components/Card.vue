@@ -1,6 +1,6 @@
 <template>
 
-    <div class="nova-dashboard min-h-[auto pt-0">
+    <div class="nova-dashboard min-h-[auto] pt-0">
 
         <Filter
             v-if="activeView"
@@ -68,3 +68,11 @@
     }
 
 </script>
+
+<style lang="scss">
+
+    div[dusk="loading-view"] {
+        @apply min-h-[auto] #{!important};
+    }
+
+</style>

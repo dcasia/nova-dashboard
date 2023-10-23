@@ -1,8 +1,15 @@
+import { minimum } from '@/util'
+
 export function registerMixin(component) {
 
     component.mixins = component.mixins || []
 
     component.mixins.push({
+        data() {
+            return {
+                isLoading: false,
+            }
+        },
         mounted() {
 
             Nova.$on(`${ this.card.view }-updated`, (encoded, resource) => {
@@ -15,11 +22,17 @@ export function registerMixin(component) {
 
                 const extraParam = resource ? `/${ resource }` : ''
 
-                Nova.request({
+                this.isLoading = true
+
+                const request = minimum(Nova.request({
                     method: 'post',
                     url: `/nova-vendor/nova-dashboard/widget/update${ extraParam }`,
                     data,
-                }).then(response => this.card.value = response.data.value)
+                }))
+
+                request
+                    .then(response => this.card.value = response.data.value)
+                    .finally(() => this.isLoading = false)
 
             })
 

@@ -2,9 +2,9 @@
 
     <Card class="nova-dashboard-filter mb-4 transition-padding"
           :style="{ '--columns-desktop': columns || 2 }"
-          :class="{ '--active px-1 pb-1': filtersAreApplied, 'px-1': !filtersAreApplied, '--expanded': collapsed }">
+          :class="{ '--active px-1 pb-1': filtersAreApplied, 'px-1': !filtersAreApplied, '--expanded': expanded }">
 
-        <div :class="{ 'h-11': collapsed, 'h-14': !collapsed }" class="w-full flex items-center flex transition-height">
+        <div :class="{ 'h-11': expanded, 'h-14': !expanded }" class="w-full flex items-center flex transition-height">
 
             <Dropdown class="">
 
@@ -15,15 +15,23 @@
                 <DropdownTrigger
                     :show-arrow="false"
                     :class="{
-                        'dark:hover:bg-gray-800': !filtersAreApplied && collapsed === false,
-                        'a dark:hover:bg-gray-800': !filtersAreApplied && collapsed === true,
-                        'dark:hover:bg-primary-600 text-gray-800': filtersAreApplied,
+                        'hover:text-gray-600 dark:hover:text-gray-500': !filtersAreApplied && expanded === false,
+                        'hover:bg-gray-200 dark:hover:bg-gray-800': !filtersAreApplied && expanded === true,
+                        'text-white hover:bg-primary-400 dark:hover:bg-primary-600 dark:text-gray-800': filtersAreApplied,
                     }"
-                    class="rounded hover:bg-gray-200 focus:outline-none focus:ring">
+                    class="rounded focus:outline-none focus:ring">
 
                     <BasicButton class="flex items-center">
 
-                        <Icon v-if="activeView.icon" :solid="true" :type="activeView.icon" class="mr-2"/>
+                        <div class="mr-2">
+
+                            <template v-if="activeView.icon?.trim()?.startsWith('<svg')">
+                                <div v-html="activeView.icon"/>
+                            </template>
+
+                            <Icon v-else :solid="true" :type="activeView.icon"/>
+
+                        </div>
 
                         <div>{{ activeView.name }}</div>
 
@@ -66,14 +74,14 @@
                 <button
                     v-if="!filtersAreApplied"
                     class="pb-1 pt-2 w-full block text-xs uppercase tracking-wide text-center font-bold focus:outline-none relative flex justify-end items-center"
-                    @click="collapsed = !collapsed">
+                    @click="expanded = !expanded">
 
                     <div>
                         {{ __('Filters') }}
                     </div>
 
                     <Icon type="chevron-down" width="14" class="ml-1 transition-all"
-                          :class="{ 'rotate-180': collapsed }"/>
+                          :class="{ 'rotate-180': expanded }"/>
 
                 </button>
 
@@ -94,7 +102,7 @@
 
         </div>
 
-        <Collapse :when="collapsed">
+        <Collapse :when="expanded">
 
             <div class="filter__inner bg-gray-900 rounded p-4">
 
@@ -122,7 +130,7 @@
             <Collapse :when="!filtersAreApplied">
 
                 <div class="flex justify-center items-center cursor-pointer pb-1"
-                     @click="collapsed = !collapsed">
+                     @click="expanded = !expanded">
 
                     <Icon type="chevron-up" height="12" class="translate-y-[2px]"/>
 
@@ -159,7 +167,7 @@
         ],
         data() {
             return {
-                collapsed: false,
+                expanded: false,
             }
         },
         methods: {
@@ -190,8 +198,8 @@
                 this.$emit('toggle', view)
                 this.$nextTick(() => this.initializeState())
 
-                if (this.collapsed === false) {
-                    this.collapsed = !this.filtersAreApplied
+                if (this.expanded === false) {
+                    this.expanded = !this.filtersAreApplied
                 }
 
             },
@@ -211,7 +219,7 @@
             await this.initializeState()
         },
         beforeMount() {
-            this.collapsed = this.filtersAreApplied
+            this.expanded = this.filtersAreApplied
         },
     }
 

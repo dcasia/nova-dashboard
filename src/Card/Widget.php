@@ -21,18 +21,24 @@ abstract class Widget extends Card
 
     abstract public function value(Filters $filters);
 
+    public function configure(NovaRequest $request): void
+    {
+    }
+
     public function resolveValue(NovaRequest $request, ?View $view = null): mixed
     {
         $view ??= View::findView($request, fn () => $this->caller);
 
         return $this->value(
-            Filters::fromRequest($request, $view->filters()),
+            Filters::fromRequest($request, collect($view?->filters())),
         );
     }
 
     public function jsonSerialize(): array
     {
         $request = resolve(NovaRequest::class);
+
+        $this->configure($request);
 
         return array_merge([
             'key' => $this->key(),
