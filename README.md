@@ -5,8 +5,8 @@
 [![License](https://img.shields.io/packagist/l/digital-creative/nova-dashboard)](https://github.com/dcasia/nova-dashboard/blob/master/LICENSE)
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/dcasia/nova-dashboard/nova-4/screenshots/dark.png">
-  <img alt="Laravel Nova Dashboard In Action" src="https://raw.githubusercontent.com/dcasia/nova-dashboard/nova-4/screenshots/light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/dcasia/nova-dashboard/main/screenshots/dark.png">
+  <img alt="Laravel Nova Dashboard In Action" src="https://raw.githubusercontent.com/dcasia/nova-dashboard/main/screenshots/light.png">
 </picture>
 
 The missing dashboard for Laravel Nova!
@@ -96,13 +96,13 @@ class MyCustomWidget extends ValueWidget
 ### List of current available widgets:
 
 - Value Widget: [https://github.com/dcasia/value-widget](https://github.com/dcasia/value-widget)
-- [Add your widget here.](https://github.com/dcasia/nova-dashboard/edit/nova-4/README.md)
+- [Add your widget here.](https://github.com/dcasia/nova-dashboard/edit/main/README.md)
 
 ## Filters
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/dcasia/nova-dashboard/nova-4/screenshots/filter-dark.png">
-  <img alt="Filters Preview" src="https://raw.githubusercontent.com/dcasia/nova-dashboard/nova-4/screenshots/filter-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/dcasia/nova-dashboard/main/screenshots/filter-dark.png">
+  <img alt="Filters Preview" src="https://raw.githubusercontent.com/dcasia/nova-dashboard/main/screenshots/filter-light.png">
 </picture>
 
 These are standard nova filter classes with 1 simple difference, the method `->apply()` does not get called by default. Why?
