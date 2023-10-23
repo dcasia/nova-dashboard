@@ -2,7 +2,7 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/digital-creative/nova-dashboard)](https://packagist.org/packages/digital-creative/nova-dashboard)
 [![Total Downloads](https://img.shields.io/packagist/dt/digital-creative/nova-dashboard)](https://packagist.org/packages/digital-creative/nova-dashboard)
-[![License](https://img.shields.io/packagist/l/digital-creative/nova-dashboard)](https://github.com/dcasia/nova-dashboard/blob/master/LICENSE)
+[![License](https://img.shields.io/packagist/l/digital-creative/nova-dashboard)](https://github.com/dcasia/nova-dashboard/blob/main/LICENSE)
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/dcasia/nova-dashboard/main/screenshots/dark.png">
@@ -173,4 +173,4 @@ Please give a ⭐️ if this project helped you!
 
 ## License
 
-The MIT License (MIT). Please see [License File](https://raw.githubusercontent.com/dcasia/nova-dashboard/master/LICENSE) for more information.
+The MIT License (MIT). Please see [License File](https://raw.githubusercontent.com/dcasia/nova-dashboard/main/LICENSE) for more information.
