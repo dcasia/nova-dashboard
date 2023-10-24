@@ -15,47 +15,13 @@
             :via-relationship="viaRelationship"
             @toggle="onViewChange"/>
 
-        <!--        <Cards v-if="activeView && activeView.widgets.length" :cards="activeView.widgets"/>-->
+        <div class="flex justify-center w-[calc(100%+24px)] -ml-[12px]">
 
-        <!--        <section class="grid-stack">-->
-
-        <!--            <div v-for="card in activeView.widgets"-->
-        <!--                 :key="`${card.component}.${card.uriKey}`"-->
-        <!--                 :gs-id="`${card.component}.${card.uriKey}`"-->
-        <!--                 class="grid-stack-item"-->
-        <!--                 :gs-x="card.grid.x"-->
-        <!--                 :gs-y="card.grid.y"-->
-        <!--                 :gs-h="card.grid.h"-->
-        <!--                 :gs-w="card.grid.w"-->
-        <!--                 gs-auto-position="true">-->
-
-        <!--                <div class="grid-stack-item-content h-full">-->
-
-        <!--                    <component-->
-        <!--                        :key="`${card.component}.${card.uriKey}`"-->
-        <!--                        class="h-full"-->
-        <!--                        :is="card.component"-->
-        <!--                        :card="card"-->
-        <!--                        :resource="resource"-->
-        <!--                        :resourceName="resourceName"-->
-        <!--                        :resourceId="resourceId"-->
-        <!--                        :lens="lens"-->
-        <!--                    />-->
-
-        <!--                </div>-->
-
-        <!--            </div>-->
-
-        <!--        </section>-->
-
-        <div class="flex justify-center">
-
-            <div class="grid-stack h-full w-full">
+            <div ref="gridStack" class="grid-stack h-full w-full">
                 <Widget v-for="widget in activeView.widgets" :widget="widget" :key="widget.key"/>
             </div>
 
         </div>
-
 
     </div>
 
@@ -84,32 +50,16 @@
             const view = this.card.views.find(view => view.key === key)
 
             return {
+                grid: null,
                 activeView: view ?? this.card.views[ 0 ],
             }
 
         },
         mounted() {
-
-            const margin = 10
-
-            var grid = GridStack.init({
-                // float: true,
-                cellHeight: 160 + margin * 2,
-                margin: margin,
-                auto: false,
-
-
-                acceptWidgets: true,
-            })
-
-            this.$nextTick(() => {
-
-                for (const widget of this.activeView.widgets) {
-                    grid.makeWidget(`#${ widget.key }`)
-                }
-
-            })
-
+            this.createGrid()
+        },
+        unmounted() {
+            this.destroyGrid()
         },
         created() {
 
@@ -125,7 +75,92 @@
             }
 
         },
+        watch: {
+            activeView() {
+                this.createGrid()
+            },
+        },
+        computed: {
+            cacheKey() {
+                return `${ this.activeView.key }-widgets`
+            },
+        },
         methods: {
+            destroyGrid() {
+
+                if (this.grid) {
+                    this.grid.offAll()
+                    this.grid.destroy(false)
+                    this.$refs.gridStack?.removeAttribute('gs-static')
+                }
+
+            },
+            createGrid() {
+
+                this.destroyGrid()
+
+                const margin = 12
+
+                this.grid = GridStack.init({
+                    staticGrid: this.activeView.static,
+                    cellHeight: 160 + margin * 2,
+                    margin: margin,
+                    animate: false,
+                    auto: false,
+                })
+
+                this.$nextTick(() => {
+
+                    const savedWidgets = this.loadGrid()
+
+                    for (const widget of this.activeView.widgets) {
+
+                        const savedWidget = savedWidgets.find(item => item.id === widget.key)
+                        const layout = this.activeView.static === true
+                            ? widget
+                            : savedWidget ?? widget
+
+                        this.grid.makeWidget(`#${ widget.key }`, {
+                            autoPosition: false,
+                            id: widget.key,
+                            minW: widget.minWidth,
+                            minH: widget.minHeight,
+                            x: layout.x,
+                            y: layout.y,
+                            w: layout.width,
+                            h: layout.height,
+                        })
+
+                    }
+
+                    this.grid.setAnimation(true)
+
+                    this.grid.on('drag', () => this.saveGrid())
+                    this.grid.on('resize', () => this.saveGrid())
+
+                })
+
+            },
+            loadGrid() {
+                try {
+                    return JSON.parse(localStorage.getItem(this.cacheKey)) ?? []
+                } catch {
+                    return []
+                }
+            },
+            saveGrid() {
+
+                const nodes = this.grid.engine.nodes.map(node => ({
+                    id: node.id,
+                    width: node.w,
+                    height: node.h,
+                    x: node.x,
+                    y: node.y,
+                }))
+
+                localStorage.setItem(this.cacheKey, JSON.stringify(nodes))
+
+            },
             onViewChange(view) {
                 this.activeView = view
             },

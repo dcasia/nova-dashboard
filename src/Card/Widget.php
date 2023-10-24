@@ -6,17 +6,16 @@ namespace DigitalCreative\NovaDashboard\Card;
 
 use DigitalCreative\NovaDashboard\Filters;
 use DigitalCreative\NovaDashboard\Traits\GuessCaller;
-use Illuminate\Support\Str;
-use Laravel\Nova\Card;
+use Laravel\Nova\Element;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-abstract class Widget extends Card
+abstract class Widget extends Element
 {
     use GuessCaller;
 
     public function key(): string
     {
-        return static::class;
+        return md5(static::class);
     }
 
     abstract public function value(Filters $filters);
@@ -34,9 +33,34 @@ abstract class Widget extends Card
         );
     }
 
-    public function grid(int $x, int $y, int $width, int $height): self
+    public function layout(int $width, int $height, int $x, int $y): self
     {
-        return $this->withMeta([ 'grid' => [ 'x' => $x, 'y' => $y, 'w' => $width, 'h' => $height ] ]);
+        return $this->width($width)->height($height)->position($x, $y);
+    }
+
+    public function position(int $x, int $y): self
+    {
+        return $this->withMeta([ 'x' => $x, 'y' => $y ]);
+    }
+
+    public function width(int $width): self
+    {
+        return $this->withMeta([ 'width' => $width ]);
+    }
+
+    public function height(int $height): self
+    {
+        return $this->withMeta([ 'height' => $height ]);
+    }
+
+    public function minWidth(int $width): self
+    {
+        return $this->withMeta([ 'minWidth' => $width ]);
+    }
+
+    public function minHeight(int $height): self
+    {
+        return $this->withMeta([ 'minHeight' => $height ]);
     }
 
     public function jsonSerialize(): array
@@ -47,8 +71,11 @@ abstract class Widget extends Card
 
         return array_merge([
             'key' => $this->key(),
-            'uriKey' => Str::random(),
             'value' => $this->resolveValue($request),
+            'width' => 2,
+            'height' => 1,
+            'x' => 0,
+            'y' => 0,
         ], parent::jsonSerialize());
     }
 }
