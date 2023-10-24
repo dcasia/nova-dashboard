@@ -34,6 +34,11 @@ abstract class Widget extends Card
         );
     }
 
+    public function grid(int $x, int $y, int $width, int $height): self
+    {
+        return $this->withMeta([ 'grid' => [ 'x' => $x, 'y' => $y, 'w' => $width, 'h' => $height ] ]);
+    }
+
     public function jsonSerialize(): array
     {
         $request = resolve(NovaRequest::class);
