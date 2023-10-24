@@ -269,7 +269,7 @@
     .nova-dashboard-filter {
 
         &.\--expanded {
-            @apply bg-gray-300;
+            @apply bg-gray-200;
         }
 
         &.\--active {

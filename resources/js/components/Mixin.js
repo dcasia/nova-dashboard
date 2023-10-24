@@ -7,6 +7,7 @@ export function registerMixin(component) {
     component.mixins.push({
         data() {
             return {
+                value: this.card.value,
                 isLoading: false,
             }
         },
@@ -31,7 +32,7 @@ export function registerMixin(component) {
                 }))
 
                 request
-                    .then(response => this.card.value = response.data.value)
+                    .then(response => this.value = response.data.value)
                     .finally(() => this.isLoading = false)
 
             })
