@@ -60,6 +60,11 @@ class View implements JsonSerializable
         return $this->withMeta([ 'icon' => $icon ]);
     }
 
+    public function static(): self
+    {
+        return $this->withMeta([ 'static' => true ]);
+    }
+
     public function key(): string
     {
         return md5($this->name);

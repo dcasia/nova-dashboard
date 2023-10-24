@@ -7,6 +7,7 @@
     },
     "devDependencies": {
         "@vue/compiler-sfc": "^3.3.4",
+        "gridstack": "^9.4.0",
         "laravel-mix": "^6.0.49",
         "mix-tailwindcss": "^1.3.0",
         "sass": "^1.68.0",

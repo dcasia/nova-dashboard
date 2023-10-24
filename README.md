@@ -55,6 +55,11 @@ class Main extends Dashboard
 }
 ```
 
+#### Static 
+
+By default, each widget is draggable, and the user is able to rearrange it to their liking. 
+This behavior can be disabled by calling `$view->static()`.
+
 ## Widgets
 
 The widgets are responsible for displaying your data on your views; they are essentially standard Nova cards.
@@ -93,9 +98,19 @@ class MyCustomWidget extends ValueWidget
 }
 ```
 
+All widgets have common methods to configure their size and position.
+The value is not in pixels but in grid units, ranging from `1` to `12` (corresponding to 12 columns).
+
+```php
+$widget->layout(width: 2, height: 1, x: 0, y: 1);
+$widget->minWidth(2);
+$widget->minHeight(1);
+```
+
 ### List of current available widgets:
 
 - Value Widget: [https://github.com/dcasia/value-widget](https://github.com/dcasia/value-widget)
+- Table Widget: [https://github.com/dcasia/table-widget](https://github.com/dcasia/table-widget)
 - [Add your widget here.](https://github.com/dcasia/nova-dashboard/edit/main/README.md)
 
 ## Filters
