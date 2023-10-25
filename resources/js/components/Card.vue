@@ -18,7 +18,7 @@
         <div class="flex justify-center w-[calc(100%+24px)] -ml-[12px]">
 
             <div ref="gridStack" class="grid-stack h-full w-full">
-                <Widget v-for="widget in activeView.widgets" :widget="widget" :key="widget.key"/>
+                <Widget v-for="widget in activeView.widgets" :widget="widget" :key="widget.key" :view="activeView.key"/>
             </div>
 
         </div>
