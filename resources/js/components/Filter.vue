@@ -1,43 +1,32 @@
 <template>
 
-    <Card class="nova-dashboard-filter mb-4 transition-padding"
+    <Card class="nova-dashboard-filter mb-4 transition-padding transition"
           :style="{ '--columns-desktop': columns || 2 }"
           :class="{ '--active px-1 pb-1': filtersAreApplied, 'px-1': !filtersAreApplied, '--expanded': expanded }">
 
-        <div :class="{ 'h-11': expanded, 'h-14': !expanded }" class="w-full flex items-center flex transition-height">
+        <div :class="{ 'h-11': expanded, 'h-14': !expanded }" class="w-full flex items-center transition-height">
 
-            <Dropdown class="">
+            <Dropdown placement="bottom-start">
 
-                <slot name="sr-only">
-                    <span class="sr-only">{{ __('Views') }}</span>
-                </slot>
+                <Button
+                    class="shadow-none"
+                    :variant="filtersAreApplied ? 'solid' : 'ghost'"
+                    padding="tight"
+                    :aria-label="__('Views Dropdown')">
 
-                <DropdownTrigger
-                    :show-arrow="false"
-                    :class="{
-                        'hover:text-gray-600 dark:hover:text-gray-500': !filtersAreApplied && expanded === false,
-                        'hover:bg-gray-200 dark:hover:bg-gray-800': !filtersAreApplied && expanded === true,
-                        'text-white hover:bg-primary-400 dark:hover:bg-primary-600 dark:text-gray-800': filtersAreApplied,
-                    }"
-                    class="rounded focus:outline-none focus:ring">
+                    <div class="mr-2">
 
-                    <BasicButton class="flex items-center">
+                        <template v-if="activeView.icon?.trim()?.startsWith('<svg')">
+                            <div v-html="activeView.icon"/>
+                        </template>
 
-                        <div class="mr-2">
+                        <Icon v-else :name="activeView.icon"/>
 
-                            <template v-if="activeView.icon?.trim()?.startsWith('<svg')">
-                                <div v-html="activeView.icon"/>
-                            </template>
+                    </div>
 
-                            <Icon v-else :solid="true" :type="activeView.icon"/>
+                    <div>{{ activeView.name }}</div>
 
-                        </div>
-
-                        <div>{{ activeView.name }}</div>
-
-                    </BasicButton>
-
-                </DropdownTrigger>
+                </Button>
 
                 <template #menu>
 
@@ -73,18 +62,18 @@
 
                 <button
                     v-if="!filtersAreApplied"
-                    class="pb-1 pt-2 w-full block text-xs uppercase tracking-wide text-center font-bold focus:outline-none relative flex justify-end items-center"
+                    class="py-2 w-full text-xs uppercase tracking-wide text-center font-bold focus:outline-none relative flex justify-end items-center"
                     @click="expanded = !expanded">
 
                     <div>
                         {{ __('Filters') }}
                     </div>
 
-                    <Icon type="chevron-down" width="14" class="ml-1 transition-all"
+                    <Icon name="chevron-down"
+                          class="ml-1 transition-all w-4 h-4"
                           :class="{ 'rotate-180': expanded }"/>
 
-                </button>
-
+                </Button>
 
                 <div v-if="filtersAreApplied" class="w-full">
 
@@ -132,7 +121,7 @@
                 <div class="flex justify-center items-center cursor-pointer pb-1"
                      @click="expanded = !expanded">
 
-                    <Icon type="chevron-up" height="12" class="translate-y-[2px]"/>
+                    <Icon name="chevron-up" class="h-3 translate-y-[2px]"/>
 
                 </div>
 
@@ -149,11 +138,12 @@
     import Filterable from '@/mixins/Filterable'
     import InteractsWithQueryString from '@/mixins/InteractsWithQueryString'
     import { Collapse } from 'vue-collapsed'
+    import { Button, Icon } from 'laravel-nova-ui'
 
     export default {
-        components: { Collapse },
+        components: { Collapse, Button, Icon },
         mixins: [ Filterable, InteractsWithQueryString ],
-        emits: [ 'filter-changed', 'toggle' ],
+        emits: [ 'toggle' ],
         props: [
             'views',
             'activeView',
@@ -245,7 +235,7 @@
             @apply bg-primary-500;
 
             .filter__header {
-                @apply text-gray-800;
+                @apply text-gray-900;
             }
 
         }
@@ -287,7 +277,7 @@
         }
 
         .filter__header {
-            @apply text-gray-500;
+            @apply text-gray-600;
         }
 
         --columns-mobile: 1;
