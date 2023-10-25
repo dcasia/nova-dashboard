@@ -6,7 +6,7 @@
 
             <component
                 class="h-full w-full"
-                :key="`${ widget.component }.${ widget.key }`"
+                :key="`${ widget.component }.${ widget.key }.${ view }`"
                 :is="widget.component"
                 :card="{ ...widget, uriKey: widget.key }"
             />
@@ -20,7 +20,7 @@
 <script>
 
     export default {
-        props: [ 'widget' ],
+        props: [ 'widget', 'view' ],
     }
 
 </script>
