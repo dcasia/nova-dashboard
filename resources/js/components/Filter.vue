@@ -10,6 +10,7 @@
 
                 <Button
                     class="shadow-none"
+                    :class="{ 'hover:!bg-transparent': !filtersAreApplied }"
                     :variant="filtersAreApplied ? 'solid' : 'ghost'"
                     padding="tight"
                     :aria-label="__('Views Dropdown')">
