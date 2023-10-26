@@ -103,7 +103,7 @@
 
                 this.grid = GridStack.init({
                     staticGrid: this.activeView.static,
-                    cellHeight: 160 + margin * 2,
+                    cellHeight: this.activeView.cellHeight + margin * 2,
                     margin: margin,
                     animate: false,
                     auto: false,
