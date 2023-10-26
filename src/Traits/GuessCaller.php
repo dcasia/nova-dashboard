@@ -9,18 +9,26 @@ use Laravel\Nova\Dashboard;
 
 trait GuessCaller
 {
-    private Dashboard|Resource $caller;
+    protected Dashboard|Resource $caller;
 
-    public function __construct()
+    public function __construct(Dashboard|Resource $caller = null)
     {
-        $caller = collect(debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 5))
-            ->firstWhere(function (array $data) {
+        if ($caller) {
 
-                return is_subclass_of(data_get($data, 'class'), Dashboard::class)
-                    || is_subclass_of(data_get($data, 'class'), Resource::class);
+            $this->caller = $caller;
 
-            });
+        } else {
 
-        $this->caller = $caller[ 'object' ];
+            $caller = collect(debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 5))
+                ->firstWhere(function (array $data) {
+
+                    return is_subclass_of(data_get($data, 'class'), Dashboard::class)
+                        || is_subclass_of(data_get($data, 'class'), Resource::class);
+
+                });
+
+            $this->caller = $caller[ 'object' ];
+
+        }
     }
 }

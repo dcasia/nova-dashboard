@@ -7,6 +7,7 @@ module.exports = {
         extend: {
             ...theme.extend,
             transitionProperty: {
+                color: 'color',
                 width: 'width',
                 height: 'height',
                 padding: 'padding',

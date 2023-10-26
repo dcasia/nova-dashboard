@@ -61,6 +61,9 @@ trait ResolveView
 
     public function resolveWidgetValue(NovaRequest $request, string $key): mixed
     {
-        return $this->findWidgetByKey($key)?->resolveValue($request, $this);
+        $widget = $this->findWidgetByKey($key);
+        $widget?->configure($request);
+
+        return $widget?->resolveValue($request, $this);
     }
 }

@@ -1,6 +1,6 @@
 <template>
 
-    <Card class="nova-dashboard-filter mb-4 transition-padding transition"
+    <Card class="nova-dashboard-filter mb-4"
           :style="{ '--columns-desktop': columns || 2 }"
           :class="{ '--active px-1 pb-1': filtersAreApplied, 'px-1': !filtersAreApplied, '--expanded': expanded }">
 
@@ -226,6 +226,8 @@
 <style lang="scss" scoped>
 
     .dark .nova-dashboard-filter {
+
+        @apply transition-all;
 
         &.\--expanded {
             @apply bg-gray-700;
