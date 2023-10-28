@@ -19,6 +19,13 @@ You can install the package via composer:
 composer require digital-creative/nova-dashboard
 ```
 
+## List of current available widgets:
+
+- Value Widget: [https://github.com/dcasia/value-widget](https://github.com/dcasia/value-widget)
+- Table Widget: [https://github.com/dcasia/table-widget](https://github.com/dcasia/table-widget)
+- ChartJs Widget: [https://github.com/dcasia/chartjs-widget](https://github.com/dcasia/chartjs-widget)
+- [Add your widget here.](https://github.com/dcasia/nova-dashboard/edit/main/README.md)
+
 ## Usage
 
 The dashboard itself is simply a standard Laravel Nova card, so you can use it either as a card on any resource 
@@ -106,12 +113,6 @@ $widget->layout(width: 2, height: 1, x: 0, y: 1);
 $widget->minWidth(2);
 $widget->minHeight(1);
 ```
-
-### List of current available widgets:
-
-- Value Widget: [https://github.com/dcasia/value-widget](https://github.com/dcasia/value-widget)
-- Table Widget: [https://github.com/dcasia/table-widget](https://github.com/dcasia/table-widget)
-- [Add your widget here.](https://github.com/dcasia/nova-dashboard/edit/main/README.md)
 
 ## Filters
 

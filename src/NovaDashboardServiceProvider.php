@@ -17,6 +17,15 @@ class NovaDashboardServiceProvider extends ServiceProvider
             $this->routes();
         });
 
+        /**
+         * Inject a new middleware to ensure nova-dashboard is always loaded before any widget
+         */
+        config([
+            'nova.middleware' => array_merge(config('nova.middleware', []), [
+                SortAssets::class,
+            ]),
+        ]);
+
         Nova::serving(function (ServingNova $event): void {
 
             Nova::script('nova-dashboard', __DIR__ . '/../dist/js/card.js');

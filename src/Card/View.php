@@ -60,6 +60,11 @@ class View implements JsonSerializable
         return $this->withMeta([ 'icon' => $icon ]);
     }
 
+    public function cellHeight(int $height): self
+    {
+        return $this->withMeta([ 'cellHeight' => $height ]);
+    }
+
     public function static(): self
     {
         return $this->withMeta([ 'static' => true ]);
@@ -85,6 +90,7 @@ class View implements JsonSerializable
         return array_merge([
             'name' => $this->name,
             'key' => $this->key(),
+            'cellHeight' => 160,
         ], $this->meta());
     }
 }

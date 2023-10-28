@@ -63,6 +63,11 @@ abstract class Widget extends Element
         return $this->withMeta([ 'minHeight' => $height ]);
     }
 
+    public function getMeta(string $metaAttribute, mixed $default = null): mixed
+    {
+        return data_get($this->meta, $metaAttribute, $default);
+    }
+
     public function jsonSerialize(): array
     {
         $request = resolve(NovaRequest::class);
