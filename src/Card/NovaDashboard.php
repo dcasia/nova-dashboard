@@ -6,6 +6,7 @@ namespace DigitalCreative\NovaDashboard\Card;
 
 use Closure;
 use Laravel\Nova\Card;
+use Laravel\Nova\Http\Requests\NovaRequest;
 
 class NovaDashboard extends Card
 {
@@ -28,6 +29,10 @@ class NovaDashboard extends Card
         $views = data_get($this->meta, 'views', []);
         $views[] = value($view, View::make($name));
 
-        return $this->withMeta([ 'views' => $views ]);
+        return $this->withMeta([
+            'views' => collect($views)
+                ->filter(fn (View $view) => $view->authorizedToSee(resolve(NovaRequest::class)))
+                ->values(),
+        ]);
     }
 }

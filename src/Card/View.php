@@ -7,7 +7,9 @@ namespace DigitalCreative\NovaDashboard\Card;
 use DigitalCreative\NovaDashboard\Traits\ResolveView;
 use Illuminate\Support\Collection;
 use JsonSerializable;
+use Laravel\Nova\AuthorizedToSee;
 use Laravel\Nova\Filters\Filter;
+use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Makeable;
 use Laravel\Nova\Metable;
 
@@ -16,6 +18,7 @@ class View implements JsonSerializable
     use Makeable;
     use Metable;
     use ResolveView;
+    use AuthorizedToSee;
 
     public function __construct(
         private readonly string $name,
@@ -31,7 +34,11 @@ class View implements JsonSerializable
             $metaWidgets[] = $widget;
         }
 
-        return $this->withMeta([ 'widgets' => $metaWidgets ]);
+        return $this->withMeta([
+            'widgets' => collect($metaWidgets)
+                ->filter(fn (Widget $widget) => $widget->authorizedToSee(resolve(NovaRequest::class)))
+                ->values(),
+        ]);
     }
 
     public function addWidgets(array $widgets): self
@@ -47,7 +54,11 @@ class View implements JsonSerializable
             $metaFilters[] = $filter;
         }
 
-        return $this->withMeta([ 'filters' => $metaFilters ]);
+        return $this->withMeta([
+            'filters' => collect($metaFilters)
+                ->filter(fn (Filter $filter) => $filter->authorizedToSee(resolve(NovaRequest::class)))
+                ->values(),
+        ]);
     }
 
     public function addFilters(array $filters): self
