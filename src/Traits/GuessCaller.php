@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace DigitalCreative\NovaDashboard\Traits;
 
-use App\Nova\Resources\Resource;
+use Laravel\Nova\Resource;
 use Laravel\Nova\Dashboard;
 
 trait GuessCaller
